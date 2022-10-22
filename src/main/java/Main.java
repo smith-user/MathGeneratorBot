@@ -1,5 +1,8 @@
+import bot.ConsoleBot;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        ConsoleBot bot = new ConsoleBot();
+        bot.run();
     }
 }
