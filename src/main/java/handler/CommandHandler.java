@@ -1,46 +1,68 @@
 package handler;
 
+import com.google.gson.JsonSyntaxException;
 import handler.CommandHandlerException.NoGeneratedTasksException;
+import handler.CommandHandlerException.StorageErrorException;
 import handler.CommandHandlerException.UnknownCommandException;
+import storage.JsonStorage;
 import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
 import tasksGenerator.TasksGenerator;
 import tasksGenerator.taskTypes.TaskType;
+import tasksGenerator.taskTypes.TypesEnum;
 
+import java.io.IOException;
+import java.nio.file.InvalidPathException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class CommandHandler implements Command {
+    private static final TasksGenerator generator = new TasksGenerator();
 
-    private static final String HELP_TEXT = "help here";
-    private final TasksGenerator generator = new TasksGenerator();
+    private static StringBuilder help_text = new StringBuilder("""
+            Бот может генерировать математические задачи по заданной теме.
+            /getTasks <type> <number> - генерация задач типа <type> в количестве
+            <number> штук.
+            /getAnswers - выводит ответы к последним сгенерированным задачам
+            
+            Возможные типы задач: """);
+
     private ArrayList<TaskCondition> tasks = new ArrayList<>();
     private ArrayList<TaskSolution> tasksSolution = new ArrayList<>();
+    //private JsonStorage storage;
+    /*
+    public CommandHandler() throws StorageErrorException {
+        try {
+            storage = new JsonStorage();
+        } catch (IOException | IllegalArgumentException | JsonSyntaxException e) {
+            throw new StorageErrorException();
+        }
+    }
+
+     */
 
     @Override
     public String processCommand(int userId, String command, String arguments)
-            throws UnknownCommandException, InvalidParameterException, NoGeneratedTasksException{
-        String response = null;
-        switch (command) {
-            case "/start":
-                break;
-            case "/help":
-                response = getHelp();
-                break;
-            case "/getTasks":
-                response = getTasksByArguments(arguments);
-                break;
-            case "/getAnswers":
-                response = getAnswers();
-                break;
-            default:
-                throw new UnknownCommandException();
-        }
+            throws UnknownCommandException, InvalidParameterException,
+                    NoGeneratedTasksException, IOException{
+        String response = switch (command) {
+            case "/start" -> addUser(userId);
+            case "/help" -> getHelp();
+            case "/getTasks" -> getTasksByArguments(arguments);
+            case "/getAnswers" -> getAnswers();
+            default -> throw new UnknownCommandException();
+        };
         return response;
     }
 
     private String getHelp(){
-        return HELP_TEXT;
+        for (TypesEnum i : generator.getNamesOfTaskTypes()) {
+            help_text.append(" ").append(i.toString()).append(",");
+        }
+
+        return help_text.toString();
     };
 
     private String addUser(int userId) {
