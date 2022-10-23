@@ -18,7 +18,7 @@ public class CommandHandler implements Command {
     private ArrayList<TaskSolution> tasksSolution = new ArrayList<>();
 
     @Override
-    public String processCommand(String command, String arguments)
+    public String processCommand(int userId, String command, String arguments)
             throws UnknownCommandException, InvalidParameterException, NoGeneratedTasksException{
         String response = null;
         switch (command) {
@@ -42,6 +42,10 @@ public class CommandHandler implements Command {
     private String getHelp(){
         return HELP_TEXT;
     };
+
+    private String addUser(int userId) {
+        return null;
+    }
 
     private String getTasksByArguments(String arguments) throws InvalidParameterException{
         if (arguments == null) {

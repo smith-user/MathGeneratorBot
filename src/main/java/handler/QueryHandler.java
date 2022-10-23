@@ -8,13 +8,13 @@ import java.util.HashMap;
 
 public class QueryHandler {
     private final Command commandHandler = new CommandHandler();
-    public String getResponse(String userQuery) {
+    public String getResponse(String userQuery, int userId) {
         String[] userQueryArray = userQuery.split(" ", 2);
         String command = userQueryArray[0];
         String arguments = (userQueryArray.length > 1) ? userQueryArray[1] : null;
         String response;
         try {
-            response = commandHandler.processCommand(command, arguments);
+            response = commandHandler.processCommand(userId, command, arguments);
         } catch (InvalidParameterException e) {
             response = e.getMessage();
         } catch (NoGeneratedTasksException e) {
