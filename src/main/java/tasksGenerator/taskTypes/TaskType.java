@@ -5,14 +5,14 @@ import tasksGenerator.TaskSolution;
 
 abstract public class TaskType {
 
-    TaskCondition condition;
-    TaskSolution solution;
+    protected TaskCondition condition;
+    protected TaskSolution solution;
     public TaskSolution getSolution() {
         return solution;
     };
     public TaskCondition getCondition() {
         return condition;
     };
-    abstract protected void generate();
-    abstract protected void solve();
+    abstract protected TaskCondition generate();
+    abstract protected TaskSolution solve();
 }

@@ -6,6 +6,7 @@ import tasksGenerator.taskTypes.TaskType;
 import tasksGenerator.taskTypes.TypesEnum;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class TasksGenerator {
@@ -15,7 +16,11 @@ public class TasksGenerator {
     }
 
     public String[] getNamesOfTaskTypes(){
-        return Arrays.toString(TypesEnum.values()).split(" ");
+        ArrayList<String> names = new ArrayList<>();
+        for(TypesEnum i : TypesEnum.values()) {
+            names.add(i.name());
+        }
+        return names.toArray(new String[0]);
     }
 
     public TaskType getNewTaskByType(String strType) throws InvalidParameterException {

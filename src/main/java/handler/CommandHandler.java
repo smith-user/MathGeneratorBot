@@ -2,9 +2,9 @@ package handler;
 
 import com.google.gson.JsonSyntaxException;
 import handler.CommandHandlerException.NoGeneratedTasksException;
-import handler.CommandHandlerException.StorageErrorException;
+//import handler.CommandHandlerException.StorageErrorException;
 import handler.CommandHandlerException.UnknownCommandException;
-import storage.JsonStorage;
+//import storage.JsonStorage;
 import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
 import tasksGenerator.TasksGenerator;
@@ -46,7 +46,7 @@ public class CommandHandler implements Command {
     @Override
     public String processCommand(int userId, String command, String arguments)
             throws UnknownCommandException, InvalidParameterException,
-                    NoGeneratedTasksException, IOException{
+                    NoGeneratedTasksException {
         String response = switch (command) {
             case "/start" -> addUser(userId);
             case "/help" -> getHelp();
@@ -58,7 +58,7 @@ public class CommandHandler implements Command {
     }
 
     private String getHelp(){
-        for (TypesEnum i : generator.getNamesOfTaskTypes()) {
+        for (String i : generator.getNamesOfTaskTypes()) {
             help_text.append(" ").append(i.toString()).append(",");
         }
 
@@ -93,7 +93,8 @@ public class CommandHandler implements Command {
         StringBuilder tmpResponse = new StringBuilder();
         for (TaskCondition task : tasks) {
             tmpResponse.append(task.getCondition())
-                       .append(task.getExpression());
+                       .append(task.getExpression())
+                       .append("\n");
         }
         return tmpResponse.toString();
     }
@@ -105,7 +106,9 @@ public class CommandHandler implements Command {
         StringBuilder tmpResponse = new StringBuilder();
         for (TaskSolution taskSolution: tasksSolution) {
             tmpResponse.append(taskSolution.getResult())
-                       .append(taskSolution.getSolutionSteps());
+                       .append("\n")
+                       .append(taskSolution.getSolutionSteps())
+                       .append("\n");
         }
         return tmpResponse.toString();
     }

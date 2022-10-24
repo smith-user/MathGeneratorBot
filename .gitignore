@@ -2,5 +2,10 @@
 /shelf/
 /.idea/workspace.xml
 
+<<<<<<< HEAD
 /.idea
 /target
+=======
+/target
+/.idea
+>>>>>>> 7b42543 (adds generators)
