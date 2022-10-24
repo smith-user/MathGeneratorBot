@@ -32,7 +32,7 @@ public class RationalArithmeticTask extends TaskType {
                 condition = generate();
                 solution = solve();
                 break;
-            } catch (ArithmeticException e) {
+            } catch (ArithmeticException | IllegalArgumentException e) {
                 continue;
             }
         }
