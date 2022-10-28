@@ -30,11 +30,11 @@ public class CommandHandler implements Command{
     private ArrayList<TaskSolution> tasksSolution = new ArrayList<>();
     private JsonStorage storage;
 
-    public CommandHandler() throws StorageErrorException {
+    public CommandHandler() {
         try {
             storage = new JsonStorage();
         } catch (IOException | IllegalArgumentException | JsonSyntaxException e) {
-            throw new StorageErrorException();
+            System.exit(1);
         }
     }
 
@@ -156,8 +156,6 @@ public class CommandHandler implements Command{
                        .append("\n")
                        .append("\n");
         }
-        tasks.clear();
-        tasksSolution.clear();
         return tmpResponse.toString();
     }
 }
