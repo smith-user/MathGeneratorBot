@@ -1,15 +1,19 @@
 package handler;
 
+import com.google.gson.JsonSyntaxException;
 import handler.CommandHandlerException.NoGeneratedTasksException;
 //import handler.CommandHandlerException.StorageErrorException;
+import handler.CommandHandlerException.StorageErrorException;
 import handler.CommandHandlerException.UnknownCommandException;
 //import storage.JsonStorage;
+import storage.JsonStorage;
 import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
 import tasksGenerator.TasksGenerator;
 import tasksGenerator.taskTypes.TaskType;
 
 
+import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
@@ -26,8 +30,8 @@ public class CommandHandler implements Command{
 
     private ArrayList<TaskCondition> tasks = new ArrayList<>();
     private ArrayList<TaskSolution> tasksSolution = new ArrayList<>();
-    //private JsonStorage storage;
-    /*
+    private JsonStorage storage;
+
     public CommandHandler() throws StorageErrorException {
         try {
             storage = new JsonStorage();
@@ -36,12 +40,10 @@ public class CommandHandler implements Command{
         }
     }
 
-     */
-
     @Override
     public String processCommand(int userId, String command, String arguments)
             throws UnknownCommandException, InvalidParameterException,
-                    NoGeneratedTasksException {
+                    NoGeneratedTasksException, StorageErrorException {
         CommandType commandType;
         try {
             commandType = CommandType.valueOf(command.substring(1).toUpperCase());
@@ -59,14 +61,19 @@ public class CommandHandler implements Command{
 
     private String getHelp(){
         for (String i : generator.getNamesOfTaskTypes()) {
-            help_text.append(" ").append(i.toString()).append(",");
+            help_text.append(" ").append(i).append(",");
         }
 
         return help_text.toString();
     };
 
-    private String addUser(int userId) {
-        return null;
+    private String addUser(int userId) throws StorageErrorException{
+        try {
+            storage.addUser(userId);
+        } catch (IOException e) {
+            throw new StorageErrorException("Не удалось добавить вас в список пользователей");
+        }
+        return "Вы добавлены в список пользователей";
     }
 
     private String getTasksByArguments(String arguments) throws InvalidParameterException{
