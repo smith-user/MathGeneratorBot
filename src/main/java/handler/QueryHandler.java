@@ -20,12 +20,9 @@ public class QueryHandler {
         String response;
         try {
             response = commandHandler.processCommand(userId, command, arguments);
-        } catch (InvalidParameterException | StorageErrorException e) {
+        } catch (InvalidParameterException | StorageErrorException |
+                NoGeneratedTasksException | UnknownCommandException e) {
             response = e.getMessage();
-        } catch (NoGeneratedTasksException e) {
-            response = "Нет задач для которых можно вывести ответы";
-        } catch (UnknownCommandException e) {
-            response = "Неизветсная команда";
         }
 
         return response;

@@ -48,7 +48,7 @@ public class CommandHandler implements Command{
         try {
             commandType = CommandType.valueOf(command.substring(1).toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new UnknownCommandException(command);
+            throw new UnknownCommandException(DefaultResponse.UNKNOWN_COMMAND + ' ' + command);
         }
         String response = switch (commandType) {
             case START-> addUser(userId);
@@ -71,16 +71,16 @@ public class CommandHandler implements Command{
         try {
             storage.addUser(userId);
         } catch (IOException e) {
-            throw new StorageErrorException("Не удалось добавить вас в список пользователей");
+            throw new StorageErrorException(DefaultResponse.USER_IDENTIFICATION_FAIL);
         }
-        return "Вы добавлены в список пользователей";
+        return DefaultResponse.USER_IDENTIFICATION_SUCСESS;
     }
 
     private String getTasksByArguments(String arguments) throws InvalidParameterException{
         tasks.clear();
         tasksSolution.clear();
         if (arguments == null) {
-            throw new InvalidParameterException("Введите категорию");
+            throw new InvalidParameterException(DefaultResponse.NO_TASK_TYPE);
         }
         String[] argumentsArray = arguments.split(" ");
         String type = argumentsArray[0];
@@ -88,7 +88,7 @@ public class CommandHandler implements Command{
         try {
             number = (argumentsArray.length > 1) ? Integer.parseInt(argumentsArray[1]) : 1;
         } catch (NumberFormatException e) {
-            throw new InvalidParameterException("Некорректное число задач");
+            throw new InvalidParameterException(DefaultResponse.ILLEGAL_NUMBER_OF_TASKS);
         }
         TaskType taskType;
         for (int i = 0; i < number; i++) {
@@ -110,7 +110,7 @@ public class CommandHandler implements Command{
 
     private String getAnswers() throws NoGeneratedTasksException{
         if (tasksSolution.isEmpty())
-            throw new NoGeneratedTasksException();
+            throw new NoGeneratedTasksException(DefaultResponse.NO_TASKS_GENERATED);
 
         StringBuilder tmpResponse = new StringBuilder();
         for (int i = 0; i < tasksSolution.size(); i++) {
