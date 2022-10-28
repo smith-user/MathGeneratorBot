@@ -8,6 +8,14 @@ import java.security.InvalidParameterException;
 
 public class QueryHandler {
     private Command commandHandler;
+
+    /**
+     * Принимает запрос пользователя, разделяет его на комманду и аргументы
+     * и отправляет их на обработку в {@code CommandHandler}
+     * @param userQuery Запрос пользователя
+     * @param userId id пользователя
+     * @return Ответ пользователю
+     */
     public String getResponse(String userQuery, int userId) {
         try {
             commandHandler = new CommandHandler();
