@@ -1,6 +1,5 @@
 package handler;
 
-import com.google.gson.JsonSyntaxException;
 import handler.CommandHandlerException.NoGeneratedTasksException;
 //import handler.CommandHandlerException.StorageErrorException;
 import handler.CommandHandlerException.UnknownCommandException;
@@ -9,16 +8,12 @@ import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
 import tasksGenerator.TasksGenerator;
 import tasksGenerator.taskTypes.TaskType;
-import tasksGenerator.taskTypes.TypesEnum;
 
-import java.io.IOException;
-import java.nio.file.InvalidPathException;
+
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
-public class CommandHandler implements Command {
+public class CommandHandler implements Command{
     private static final TasksGenerator generator = new TasksGenerator();
 
     private static StringBuilder help_text = new StringBuilder("""
@@ -47,12 +42,17 @@ public class CommandHandler implements Command {
     public String processCommand(int userId, String command, String arguments)
             throws UnknownCommandException, InvalidParameterException,
                     NoGeneratedTasksException {
-        String response = switch (command) {
-            case "/start" -> addUser(userId);
-            case "/help" -> getHelp();
-            case "/getTasks" -> getTasksByArguments(arguments);
-            case "/getAnswers" -> getAnswers();
-            default -> throw new UnknownCommandException();
+        CommandType commandType;
+        try {
+            commandType = CommandType.valueOf(command.substring(1).toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new UnknownCommandException(command);
+        }
+        String response = switch (commandType) {
+            case START-> addUser(userId);
+            case HELP -> getHelp();
+            case TASKS -> getTasksByArguments(arguments);
+            case ANSWERS -> getAnswers();
         };
         return response;
     }
@@ -70,6 +70,8 @@ public class CommandHandler implements Command {
     }
 
     private String getTasksByArguments(String arguments) throws InvalidParameterException{
+        tasks.clear();
+        tasksSolution.clear();
         if (arguments == null) {
             throw new InvalidParameterException("Введите категорию");
         }
@@ -104,12 +106,20 @@ public class CommandHandler implements Command {
             throw new NoGeneratedTasksException();
 
         StringBuilder tmpResponse = new StringBuilder();
-        for (TaskSolution taskSolution: tasksSolution) {
-            tmpResponse.append(taskSolution.getResult())
+        for (int i = 0; i < tasksSolution.size(); i++) {
+            tmpResponse.append(i+1)
+                       .append(") ")
+                       .append(tasks.get(i).getExpression())
                        .append("\n")
-                       .append(taskSolution.getSolutionSteps())
+                       .append("ответ: ")
+                       .append(tasksSolution.get(i).getResult())
+                       .append("\n")
+                       .append(tasksSolution.get(i).getSolutionSteps())
+                       .append("\n")
                        .append("\n");
         }
+        tasks.clear();
+        tasksSolution.clear();
         return tmpResponse.toString();
     }
 }
