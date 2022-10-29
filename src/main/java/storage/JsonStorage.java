@@ -33,13 +33,12 @@ public class JsonStorage {
     /**
      * @param pathname Путь к JSON файлу. Если файла нет, он будет создан.
      * @throws InvalidPathException Если строка {@code pathname} не является путем к файлу с расширением JSON.
-     * @throws IllegalArgumentException Если поля представленных в файле экземпляров
-     *      {@code Category} или {@code Record} имеют некорректные значения. Или массивы
-     *      этих объектов представлены в неверном формате.
+     * @throws IOException          Если возникла ошибка при попытке считать данные из JSON файла.
+     * @throws JsonSyntaxException  Если уже существующий словарь пользователей в файле представлен
+     *          в неккоректном виде {@code usersMap}
      */
-    public JsonStorage(String pathname) throws InvalidPathException, IllegalArgumentException,
-                                                IOException, JsonSyntaxException {
-        //users = new Users();
+    public JsonStorage(String pathname) throws InvalidPathException,
+            IOException, JsonSyntaxException {
         if(pathname.endsWith(".json") || pathname.endsWith(".JSON"))
             path = Paths.get(pathname);
         else
@@ -48,13 +47,8 @@ public class JsonStorage {
         updateUsersArray();
     }
 
-    /**
-     * @throws IllegalArgumentException Если поля представленных в файле экземпляров
-     * {@code Category} или {@code Record} имеют некорректные значения. Или массивы
-     * этих объектов имеют неверное представление.
-     */
     public JsonStorage() throws IllegalArgumentException, IOException {
-        this("./target/resources/categoryList.json");
+        this("./target/resources/dataStorage.json");
     }
 
     private boolean WritingFileByUsingIO(String str) {
@@ -68,16 +62,34 @@ public class JsonStorage {
         }
     }
 
+    /**
+     * Добавить пользователя в {@code usersMap}, если его там еще нет, а затем записать в JSON файл
+     * @param userId id пользователя
+     * @throws IOException Если возникла ошибка ввода-вывода при попытке записать данные в файл
+     */
     public void addUser(int userId) throws IOException{
         User user = new User(userId);
         if (usersMap.containsKey(Integer.toString(userId)))
             return;
         usersMap.put(Integer.toString(userId), user);
+        updateJSONFile();
+    }
+
+    /**
+     * Перезаписать JSON файл текущими данными, которые храняться в {@code usersMap}
+     * @throws IOException Если возникла ошибка ввода-вывода при попытке записать данные в файл
+     */
+    private void updateJSONFile() throws IOException {
         writer = new FileWriter(file);
         writer.write(gson.toJson(usersMap));
         writer.close();
     }
-
+    /**
+     * Запись в {@code usersMap} данных, которые находятся в JSON файле.
+     * @throws IOException          Если возникла ошибка при попытке считать данные из JSON файла.
+     * @throws JsonSyntaxException  Если уже существующий словарь пользователей в файле представлен
+     *                              в неккоректном виде {@code usersMap}
+     */
     private void updateUsersArray() throws JsonSyntaxException , IOException{
         reader = new FileReader(file);
         usersMap = gson.fromJson(reader, new TypeToken<Map<String, User>>(){}.getType());

@@ -12,6 +12,7 @@ import tasksGenerator.taskTypes.TaskType;
 
 
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
@@ -33,7 +34,7 @@ public class CommandHandler implements Command{
     public CommandHandler() {
         try {
             storage = new JsonStorage();
-        } catch (IOException | IllegalArgumentException | JsonSyntaxException e) {
+        } catch (IOException | InvalidPathException | JsonSyntaxException e) {
             System.exit(1);
         }
     }
@@ -56,7 +57,7 @@ public class CommandHandler implements Command{
         CommandType commandType;
         try {
             commandType = CommandType.valueOf(command.substring(1).toUpperCase());
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | StringIndexOutOfBoundsException e) {
             throw new UnknownCommandException(DefaultResponse.UNKNOWN_COMMAND + ' ' + command);
         }
         String response = switch (commandType) {
@@ -72,11 +73,12 @@ public class CommandHandler implements Command{
      * @return текст для {@code HELP}
      */
     private String getHelp(){
+        StringBuilder outputHelpText = new StringBuilder(help_text);
         for (String i : generator.getNamesOfTaskTypes()) {
-            help_text.append(" ").append(i).append(",");
+            outputHelpText.append(" ").append(i).append(",");
         }
 
-        return help_text.toString();
+        return outputHelpText.toString();
     };
 
     /**
@@ -91,7 +93,7 @@ public class CommandHandler implements Command{
         } catch (IOException e) {
             throw new StorageErrorException(DefaultResponse.USER_IDENTIFICATION_FAIL);
         }
-        return DefaultResponse.USER_IDENTIFICATION_SUCСESS;
+        return DefaultResponse.USER_IDENTIFICATION_SUCCESS;
     }
 
     /**
