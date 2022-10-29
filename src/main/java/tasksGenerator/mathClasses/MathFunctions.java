@@ -4,7 +4,17 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Stack;
 
+/**
+ * Класс, содержащий методы для математических вычислений.
+ */
 final public class MathFunctions {
+
+    /**
+     * Находит наибольший общий делитель (НОД) двух чисел.
+     * @param n1 певрое число
+     * @param n2 второе число
+     * @return наибольший общий делитель
+     */
     public static int gcdByEuclidAlgorithm(int n1, int n2) {
         while (n2 != 0) {
             int t = n2;
@@ -14,10 +24,23 @@ final public class MathFunctions {
         return n1;
     }
 
+    /**
+     * Находит наименьшее общее кратное (НОК) двух чисел.
+     * @param a певрое число
+     * @param b второе число
+     * @return наименьшее общее кратное
+     */
     public static int leastCommonMultiple(int a, int b) {
         return a * b / gcdByEuclidAlgorithm(a, b);
     }
 
+    /**
+     * Перевод матиматического выражения с рациональными числами и скобками из инфиксной нотации в постфиксную.
+     * @param exp матиматического выражения с рациональными числами
+     * @param operations ключ - математический оператор, встречающиеся в {@code exp}; значение - приоритет оператора (0 - самый низкий)
+     * @return строка {@code exp} в постфиксной нотации
+     * @throws IllegalArgumentException некорректное математическое выражение
+     */
     public static Object[] getRPN(String exp, Map<Character, Integer> operations) throws IllegalArgumentException {
         ArrayList<Object> result = new ArrayList<>();
         StringBuilder number = new StringBuilder();
@@ -37,18 +60,17 @@ final public class MathFunctions {
                         new Fraction(Integer.parseInt(number.toString()))
                 );
                 number.delete(0, number.length());
-            }
-            //TODO exception
-            //else throw new IllegalArgumentException("Некорректная строка: %s".formatted(exp.substring(0, i + 1)));
-
-            if(symbol == '(') {
+            } else if(symbol == '(') {
                 stack.push(symbol);
             } else if (symbol == ')') {
-                while (stack.peek() != '(')
+                while (!stack.empty() && stack.peek() != '(')
                     result.add(stack.pop());
-                stack.pop(); //TODO exception
-            } else {
-                int operPrio = operations.get(symbol); //TODO exception
+                if (!stack.empty() && stack.peek() == '(')
+                    stack.pop();
+                else
+                    throw new IllegalArgumentException("Некорректная строка: %s".formatted(exp.substring(0, i + 1)));
+            } else if (operations.containsKey(symbol)) {
+                int operPrio = operations.get(symbol);
                 while( !stack.empty() && operations.containsKey(stack.peek()) &&
                         (symbol != '^' && operPrio <= operations.get(stack.peek()) ||
                                 symbol == '^' && operPrio < operations.get(stack.peek()))
@@ -56,6 +78,8 @@ final public class MathFunctions {
                     result.add(stack.pop());
                 }
                 stack.push(symbol);
+            } else {
+                throw new IllegalArgumentException("Некорректная строка: %s".formatted(exp.substring(0, i + 1)));
             }
         }
         if(number.length() > 0)

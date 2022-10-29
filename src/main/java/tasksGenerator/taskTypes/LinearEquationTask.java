@@ -4,6 +4,10 @@ import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
 import tasksGenerator.mathClasses.Fraction;
 
+/**
+ * Класс представляющий тип математической задачи
+ * на нахождение корней линейного уравнения.
+ */
 public class LinearEquationTask extends TaskType {
 
     protected static final int maxNumber = 5;

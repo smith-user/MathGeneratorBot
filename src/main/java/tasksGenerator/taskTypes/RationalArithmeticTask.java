@@ -10,6 +10,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Stack;
 
+/**
+ * Класс представляющий тип математической задачи
+ * на вычисление значения выражения с рациональными числами.
+ */
 public class RationalArithmeticTask extends TaskType {
 
     protected static final Map<Character, Integer> operationsWithPriorities = Map.of(
@@ -45,6 +49,13 @@ public class RationalArithmeticTask extends TaskType {
         return new TaskCondition("Вычислить значение выражения: ", expression);
     }
 
+    /**
+     *
+     * @param depth вложенность скобок для части выражения - unit (0 - это само выражение)
+     * @param generateOperator {@code true} если нужно генерировать знак операции перед первым значение данной части выражения,
+     *                                     {@code false} если знак операции генерировать не нужно.
+     * @return строка как часть выражения - число или выражние в скобках.
+     */
     private String generateUnit(int depth, boolean generateOperator) {
         StringBuilder expression = new StringBuilder();
         boolean exprInBrackets = MathFunctions.intRandomUnsigned(5) % depth == 0;
@@ -131,7 +142,7 @@ public class RationalArithmeticTask extends TaskType {
                             fstOperand.getString(),
                             sndOperand.getString())
                     );
-                yield fstOperand.pow((int)sndOperand.toDouble());
+                yield fstOperand.pow(sndOperand);
             }
             case '/' -> {
                 if (Objects.equals(sndOperand.getString(), "0"))

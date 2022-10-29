@@ -3,31 +3,41 @@ package tasksGenerator;
 import tasksGenerator.taskTypes.RationalArithmeticTask;
 import tasksGenerator.taskTypes.LinearEquationTask;
 import tasksGenerator.taskTypes.TaskType;
-import tasksGenerator.taskTypes.TypesEnum;
+import tasksGenerator.taskTypes.Types;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
+/**
+ * Класс генерирующий математические задачи, как объекты класса {@code TaskType}
+ */
 public class TasksGenerator {
 
-    public TasksGenerator() {
+    public TasksGenerator() {}
 
-    }
-
+    /**
+     *
+     * @return список строк - названия существующих типов задач
+     */
     public String[] getNamesOfTaskTypes(){
         ArrayList<String> names = new ArrayList<>();
-        for(TypesEnum i : TypesEnum.values()) {
+        for(Types i : Types.values()) {
             names.add(i.name());
         }
         return names.toArray(new String[0]);
     }
 
+    /**
+     *
+     * @param strType название типа задачи
+     * @return задача, как как объект класса {@code TaskType}
+     * @throws InvalidParameterException если задачи типа {@code strType} не существует
+     */
     public TaskType getNewTaskByType(String strType) throws InvalidParameterException {
 
-        TypesEnum type;
+        Types type;
         try {
-            type = TypesEnum.valueOf(strType);
+            type = Types.valueOf(strType);
         } catch (IllegalArgumentException e) {
             throw new InvalidParameterException(
                     "Неверный тип задачи: \"%s\"".formatted(strType)
