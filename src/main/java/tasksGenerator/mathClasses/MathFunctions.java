@@ -55,12 +55,16 @@ final public class MathFunctions {
             ) {
                 number.append(symbol);
                 continue;
-            } else if (isNumeric(number.toString())) {
+            }
+
+            if (isNumeric(number.toString())) {
                 result.add(
                         new Fraction(Integer.parseInt(number.toString()))
                 );
                 number.delete(0, number.length());
-            } else if(symbol == '(') {
+            }
+
+            if(symbol == '(') {
                 stack.push(symbol);
             } else if (symbol == ')') {
                 while (!stack.empty() && stack.peek() != '(')
