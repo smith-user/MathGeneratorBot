@@ -21,9 +21,9 @@ public class CommandHandler implements Command{
 
     private static StringBuilder help_text = new StringBuilder("""
             Бот может генерировать математические задачи по заданной теме.
-            /getTasks <type> <number> - генерация задач типа <type> в количестве
+            /tasks <type> <number> - генерация задач типа <type> в количестве
             <number> штук.
-            /getAnswers - выводит ответы к последним сгенерированным задачам
+            /answers - выводит ответы к последним сгенерированным задачам
             
             Возможные типы задач: """);
 
