@@ -31,6 +31,8 @@ public class CommandHandler implements Command{
     private ArrayList<TaskSolution> tasksSolution = new ArrayList<>();
     private JsonStorage storage;
 
+    private final int DEFAULT_NUMBER_OF_TASK = 5;
+
     public CommandHandler() {
         try {
             storage = new JsonStorage();
@@ -107,24 +109,19 @@ public class CommandHandler implements Command{
         tasks.clear();
         tasksSolution.clear();
         if (arguments == null) {
-            throw new InvalidParameterException(DefaultResponse.NO_TASK_TYPE);
+            generateTasks(DEFAULT_NUMBER_OF_TASK);
+        } else {
+            String[] argumentsArray = arguments.split(" ");
+            String type = argumentsArray[0];
+            int number;
+            try {
+                number = (argumentsArray.length > 1) ? Integer.parseInt(argumentsArray[1]) : 1;
+            } catch (NumberFormatException e) {
+                throw new InvalidParameterException(DefaultResponse.ILLEGAL_NUMBER_OF_TASKS);
+            }
+            generateTasks(type, number);
         }
-        String[] argumentsArray = arguments.split(" ");
-        String type = argumentsArray[0];
-        int number;
-        try {
-            number = (argumentsArray.length > 1) ? Integer.parseInt(argumentsArray[1]) : 1;
-        } catch (NumberFormatException e) {
-            throw new InvalidParameterException(DefaultResponse.ILLEGAL_NUMBER_OF_TASKS);
-        }
-        TaskType taskType;
-        for (int i = 0; i < number; i++) {
-            taskType = generator.getNewTaskByType(type);
-            TaskCondition taskCondition = taskType.getCondition();
-            TaskSolution taskSolution = taskType.getSolution();
-            tasks.add(taskCondition);
-            tasksSolution.add(taskSolution);
-        }
+
 
         StringBuilder tmpResponse = new StringBuilder();
         for (TaskCondition task : tasks) {
@@ -135,6 +132,27 @@ public class CommandHandler implements Command{
         return tmpResponse.toString();
     }
 
+    private void generateTasks(String type, int number) {
+        TaskType taskType;
+        for (int i = 0; i < number; i++) {
+            taskType = generator.getNewTaskByType(type);
+            TaskCondition taskCondition = taskType.getCondition();
+            TaskSolution taskSolution = taskType.getSolution();
+            tasks.add(taskCondition);
+            tasksSolution.add(taskSolution);
+        }
+    }
+
+    private void generateTasks(int number) {
+        TaskType taskType;
+        for (int i = 0; i < number; i++) {
+            taskType = generator.getNewTask();
+            TaskCondition taskCondition = taskType.getCondition();
+            TaskSolution taskSolution = taskType.getSolution();
+            tasks.add(taskCondition);
+            tasksSolution.add(taskSolution);
+        }
+    }
     /**
      *
      * @return строку, содержащую ответы на последние сгенерированные задачи

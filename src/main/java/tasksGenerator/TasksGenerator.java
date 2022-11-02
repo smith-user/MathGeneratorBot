@@ -1,5 +1,6 @@
 package tasksGenerator;
 
+import tasksGenerator.mathClasses.MathFunctions;
 import tasksGenerator.taskTypes.RationalArithmeticTask;
 import tasksGenerator.taskTypes.LinearEquationTask;
 import tasksGenerator.taskTypes.TaskType;
@@ -43,6 +44,19 @@ public class TasksGenerator {
                     "Неверный тип задачи: \"%s\"".formatted(strType)
             );
         }
+
+        TaskType newTask = switch (type) {
+            case RATIONAL_ARITHMETIC -> new RationalArithmeticTask();
+            case LINEAR_EQUATION -> new LinearEquationTask();
+        };
+
+        return newTask;
+    }
+
+    public TaskType getNewTask() {
+        String[] taskTypes = getNamesOfTaskTypes();
+        Types type;
+        type = Types.valueOf(taskTypes[MathFunctions.intRandomUnsigned(taskTypes.length-1)]);
 
         TaskType newTask = switch (type) {
             case RATIONAL_ARITHMETIC -> new RationalArithmeticTask();
