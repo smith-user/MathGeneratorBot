@@ -9,6 +9,7 @@ import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
 import tasksGenerator.TasksGenerator;
 import tasksGenerator.MathTask;
+import tasksGenerator.exceptions.TaskCreationException;
 
 
 import java.io.IOException;
@@ -105,11 +106,17 @@ public class CommandHandler implements Command{
      * @throws InvalidParameterException Если переданы некорректные
      *     тип {@code type} и количество {@code number} задач
      */
-    private String getTasksByArguments(String arguments) throws InvalidParameterException{
+    private String getTasksByArguments(String arguments) throws InvalidParameterException {
         tasks.clear();
         tasksSolution.clear();
+        StringBuilder tmpResponse = new StringBuilder();
+
         if (arguments == null) {
-            generateTasks(DEFAULT_NUMBER_OF_TASK);
+            try{
+                generateTasks(DEFAULT_NUMBER_OF_TASK);
+            } catch (TaskCreationException e) {
+                tmpResponse.append(DefaultResponse.TASK_GENERATE_FAIL);
+            }
         } else {
             String[] argumentsArray = arguments.split(" ");
             String type = argumentsArray[0];
@@ -119,11 +126,13 @@ public class CommandHandler implements Command{
             } catch (NumberFormatException e) {
                 throw new InvalidParameterException(DefaultResponse.ILLEGAL_NUMBER_OF_TASKS);
             }
-            generateTasks(type, number);
+            try {
+                generateTasks(type, number);
+            } catch (TaskCreationException e) {
+                tmpResponse.append(DefaultResponse.TASK_GENERATE_FAIL);
+            }
         }
 
-
-        StringBuilder tmpResponse = new StringBuilder();
         for (TaskCondition task : tasks) {
             tmpResponse.append(task.getCondition())
                        .append(task.getExpression())
@@ -132,7 +141,7 @@ public class CommandHandler implements Command{
         return tmpResponse.toString();
     }
 
-    private void generateTasks(String type, int number) {
+    private void generateTasks(String type, int number) throws TaskCreationException {
         MathTask taskType;
         for (int i = 0; i < number; i++) {
             taskType = generator.getNewTaskByType(type);
@@ -143,7 +152,7 @@ public class CommandHandler implements Command{
         }
     }
 
-    private void generateTasks(int number) {
+    private void generateTasks(int number) throws TaskCreationException{
         MathTask taskType;
         for (int i = 0; i < number; i++) {
             taskType = generator.getNewTask();
