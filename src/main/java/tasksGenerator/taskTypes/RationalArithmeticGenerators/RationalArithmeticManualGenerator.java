@@ -1,7 +1,9 @@
-package tasksGenerator.taskTypes;
+package tasksGenerator.taskTypes.RationalArithmeticGenerators;
 
-import tasksGenerator.TaskCondition;
+import tasksGenerator.MathTask;
 import tasksGenerator.TaskSolution;
+import tasksGenerator.exceptions.TaskCreationException;
+import tasksGenerator.exceptions.TaskSolutionException;
 import tasksGenerator.mathClasses.Fraction;
 import tasksGenerator.mathClasses.MathFunctions;
 
@@ -10,11 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Stack;
 
-/**
- * Класс представляющий тип математической задачи
- * на вычисление значения выражения с рациональными числами.
- */
-public class RationalArithmeticTask extends TaskType {
+public class RationalArithmeticManualGenerator extends RationalArithmeticGenerator {
 
     protected static final Map<Character, Integer> operationsWithPriorities = Map.of(
             '+', 0,
@@ -27,33 +25,87 @@ public class RationalArithmeticTask extends TaskType {
     protected static final int maxDegree = 2;
     protected static final int minUnitCount = 3;
     protected static final int maxUnitCount = 5;
-
+    protected static final int maxNumberOfGenerationTrying = 7;
     private static final Character[] operations = operationsWithPriorities.keySet().toArray(new Character[0]);
 
-    public RationalArithmeticTask() {
+    @Override
+    public MathTask getMathTask() throws TaskCreationException {
+        MathTask mathTask;
+        int tryingCount = 0;
         while(true) {
             try {
-                condition = generate();
-                solution = solve();
+                mathTask = super.getMathTask();
                 break;
-            } catch (ArithmeticException | IllegalArgumentException e) {
-                continue;
+            } catch (TaskCreationException e) {
+                tryingCount++;
+                if (tryingCount > maxNumberOfGenerationTrying)
+                    throw e;
             }
         }
+        return mathTask;
     }
 
     @Override
-    protected TaskCondition generate() {
+    public RationalArithmeticTaskCondition createTaskConditionForRationalArithmetic() {
         String expression = generateUnit(1, false);
         expression = expression.substring(1, expression.length() - 1);
-        return new TaskCondition("Вычислить значение выражения: ", expression);
+        return new RationalArithmeticTaskCondition(expression);
+    }
+
+    @Override
+    protected TaskSolution createTaskSolutionForRationalArithmetic(RationalArithmeticTaskCondition condition)
+            throws TaskSolutionException {
+        ArrayList<String> steps = new ArrayList<>();
+        int stepNum = 1;
+        Object[] rpn;
+        try {
+            rpn = MathFunctions.getRPN(condition.getExpression(), operationsWithPriorities);
+        } catch (IllegalArgumentException exc) {
+            throw new TaskSolutionException(exc.getMessage());
+        }
+        Stack<Fraction> stack = new Stack<>();
+        for (Object o : rpn) {
+            Fraction fraction;
+            if (o instanceof Fraction) {
+                fraction = (Fraction) o;
+            } else if (o instanceof Character) {
+                Fraction[] operands = new Fraction[2];
+                for (int j = 0; j < operands.length; j++) {
+                    operands[j] = stack.pop();
+                }
+                try{
+                    fraction = calculateNewValue(operands[1], operands[0], (Character) o);
+                } catch (IllegalArgumentException exc) {
+                    throw new TaskSolutionException(exc.getMessage());
+                }
+                steps.add("%d. %s %s %s = %s".formatted(
+                                stepNum++,
+                                operands[1].getString(),
+                                (Character) o,
+                                operands[0].getString(),
+                                fraction.getString()
+                        )
+                );
+            } else {
+                throw new TaskSolutionException("Неверное выражение: %s".formatted(condition.getExpression()));
+            }
+            stack.push(fraction);
+        }
+
+        Fraction result;
+        if(stack.size() == 1)
+            result = stack.pop();
+        else
+            throw new TaskSolutionException("Неверное выражение: %s".formatted(condition.getExpression()));
+        return new TaskSolution(String.join("\n", steps), result.getString());
     }
 
     /**
      *
      * @param depth вложенность скобок для части выражения - unit (0 - это само выражение)
-     * @param generateOperator {@code true} если нужно генерировать знак операции перед первым значение данной части выражения,
-     *                                     {@code false} если знак операции генерировать не нужно.
+     * @param generateOperator {@code true} если нужно генерировать знак операции перед первым значением
+     *                                     данной части выражения, {@code false} если знак операции
+     *                                     генерировать не нужно.
      * @return строка как часть выражения - число или выражние в скобках.
      */
     private String generateUnit(int depth, boolean generateOperator) {
@@ -88,57 +140,17 @@ public class RationalArithmeticTask extends TaskType {
         return expression.toString();
     }
 
-    @Override
-    protected TaskSolution solve() {
-        ArrayList<String> steps = new ArrayList<>();
-        int stepNum = 1;
-        Object[] rpn = MathFunctions.getRPN(condition.getExpression(), operationsWithPriorities);
-        Stack<Fraction> stack = new Stack<>();
-        for (Object o : rpn) {
-            Fraction fraction;
-            if (o instanceof Fraction) {
-                fraction = (Fraction) o;
-            } else if (o instanceof Character) {
-                Fraction[] operands = new Fraction[2];
-                for (int j = 0; j < operands.length; j++) {
-                    if (!stack.empty())
-                        operands[j] = stack.pop();
-                    else
-                        throw new IllegalArgumentException("Неверное выражение: %s".formatted(condition.getExpression()));
-                }
-                fraction = calculateNewValue(operands[1], operands[0], (Character) o);
-                steps.add("%d. %s %s %s = %s".formatted(
-                                stepNum++,
-                                operands[1].getString(),
-                                (Character) o,
-                                operands[0].getString(),
-                                fraction.getString()
-                        )
-                );
-            } else
-                throw new IllegalArgumentException("Неверное выражение: %s".formatted(condition.getExpression()));
-            stack.push(fraction);
-        }
-
-        Fraction result;
-        if(stack.size() == 1)
-            result = stack.pop();
-        else
-            throw new IllegalArgumentException("Неверное выражение: %s".formatted(condition.getExpression()));
-        return new TaskSolution(String.join("\n", steps), result.getString());
-    }
-
     private static Fraction calculateNewValue(Fraction fstOperand, Fraction sndOperand, char operator)
             throws IllegalArgumentException
     {
         return switch (operator) {
             case '+' -> fstOperand.add(sndOperand);
             case '-' -> fstOperand.sub(sndOperand);
-            case '*' -> fstOperand.mult(sndOperand);
+            case '*' -> fstOperand.multiplication(sndOperand);
             case '^' -> {
                 double num = sndOperand.toDouble();
                 if (Math.abs(num - (int)num) > 10e-6)
-                    throw new IllegalArgumentException("Возведение числа в не целую степень: %s ^ %s".formatted(
+                    throw new IllegalArgumentException("Возведение числа не в целую степень: %s ^ %s".formatted(
                             fstOperand.getString(),
                             sndOperand.getString())
                     );
@@ -154,5 +166,3 @@ public class RationalArithmeticTask extends TaskType {
         };
     }
 }
-
-

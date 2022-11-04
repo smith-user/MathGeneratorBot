@@ -1,6 +1,6 @@
 package tasksGenerator.taskTypes;
 
-public enum Types {
+public enum MathTaskTypes {
     LINEAR_EQUATION,
     RATIONAL_ARITHMETIC
 }

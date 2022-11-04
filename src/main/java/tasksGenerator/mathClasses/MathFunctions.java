@@ -9,13 +9,25 @@ import java.util.Stack;
  */
 final public class MathFunctions {
 
+    private static final Map<Character, Integer> operationsWithPriorities = Map.of(
+            '+', 0,
+            '-', 0,
+            '*', 1,
+            '/', 1,
+            '^', 2
+    );
+
     /**
-     * Находит наибольший общий делитель (НОД) двух чисел.
      * @param n1 певрое число
      * @param n2 второе число
-     * @return наибольший общий делитель
+     * @return положительный наибольший общий делитель (НОД) чисел {@code n1} и {@code n2}
+     * @throws IllegalArgumentException если {@code n1} и {@code n2} одновременно равны 0.
      */
-    public static int gcdByEuclidAlgorithm(int n1, int n2) {
+    public static int gcdByEuclidAlgorithm(int n1, int n2) throws IllegalArgumentException {
+        if (n1 == 0 && n2 == 0)
+            throw new IllegalArgumentException("Поиск наибольшего общего делителя у двух нулей.");
+        n1 = Math.abs(n1);
+        n2 = Math.abs(n2);
         while (n2 != 0) {
             int t = n2;
             n2 = n1 % n2;
@@ -25,19 +37,34 @@ final public class MathFunctions {
     }
 
     /**
-     * Находит наименьшее общее кратное (НОК) двух чисел.
      * @param a певрое число
      * @param b второе число
-     * @return наименьшее общее кратное
+     * @return положительное нименьшее общее кратное (НОК) чисел {@code n1} и {@code n2}
+     * @throws IllegalArgumentException если {@code n1} или {@code n2} равны 0.
      */
-    public static int leastCommonMultiple(int a, int b) {
-        return a * b / gcdByEuclidAlgorithm(a, b);
+    public static int leastCommonMultiple(int a, int b) throws IllegalArgumentException {
+        if (a == 0 || b == 0)
+            throw new IllegalArgumentException();
+        a = Math.abs(a);
+        b = Math.abs(b);
+        return (a * b) / gcdByEuclidAlgorithm(a, b);
     }
 
     /**
      * Перевод матиматического выражения с рациональными числами и скобками из инфиксной нотации в постфиксную.
-     * @param exp матиматического выражения с рациональными числами
-     * @param operations ключ - математический оператор, встречающиеся в {@code exp}; значение - приоритет оператора (0 - самый низкий)
+     * @param exp матиматическое выражение с рациональными числами
+     * @return строка {@code exp} в постфиксной нотации
+     * @throws IllegalArgumentException некорректное математическое выражение
+     */
+    public static Object[] getRPN(String exp) throws IllegalArgumentException {
+        return getRPN(exp, operationsWithPriorities);
+    }
+
+    /**
+     * Перевод матиматического выражения с рациональными числами и скобками из инфиксной нотации в постфиксную.
+     * @param exp матиматического выражение с рациональными числами
+     * @param operations ключ - математический оператор, встречающиеся в {@code exp};
+     *                   значение - приоритет оператора (0 - самый низкий)
      * @return строка {@code exp} в постфиксной нотации
      * @throws IllegalArgumentException некорректное математическое выражение
      */

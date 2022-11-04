@@ -1,15 +1,14 @@
 package tasksGenerator.mathClasses;
 
 /**
- * Класс представлющий собой рациональную дробь
- * и содержащий методы для математических операций с ними.
+ * Объекты класса представлют собой рациональную дробь с целыми числителем и знаменателем.
+ * Класс содержит методы для выполнения метматических операций над дробями.
  */
 final public class Fraction {
     private final int numerator;
     private final int denominator;
 
     /**
-     *
      * @param numerator числитель рациональной дроби
      * @param denominator знаменатель рациональной дроби
      * @throws IllegalArgumentException если {@code denominator} равен нулю
@@ -18,8 +17,8 @@ final public class Fraction {
         if (denominator == 0)
             throw new IllegalArgumentException("Знаменатель равен нулю.");
         int gcd = MathFunctions.gcdByEuclidAlgorithm(numerator, denominator);
-        this.numerator = numerator / gcd;
-        this.denominator = denominator / gcd;
+        this.numerator = (denominator / Math.abs(denominator)) * numerator / gcd;
+        this.denominator = Math.abs(denominator) / gcd;
     }
 
     /**
@@ -31,9 +30,8 @@ final public class Fraction {
     }
 
     /**
-     * Сложение дроби с дробью {@code fraction}
      * @param fraction дробь, которая будет прибавлена
-     * @return результат сложения
+     * @return результат сложения - новый объект класса {@code Fraction}.
      */
     public Fraction add(Fraction fraction) {
         return new Fraction(
@@ -43,11 +41,10 @@ final public class Fraction {
     }
 
     /**
-     * Умножение дроби на дробь {@code fraction}
      * @param fraction множитель
-     * @return результат умножения
+     * @return результат умножения - новый объект класса {@code Fraction}.
      */
-    public Fraction mult(Fraction fraction) {
+    public Fraction multiplication(Fraction fraction) {
         return new Fraction(
                 numerator * fraction.numerator,
                 denominator * fraction.denominator
@@ -55,27 +52,24 @@ final public class Fraction {
     }
 
     /**
-     * Вычитание из дроби значение дроби {@code fraction}
      * @param fraction вычитаемое
-     * @return результат вычитание
+     * @return результат вычитание - новый объект класса {@code Fraction}.
      */
     public Fraction sub(Fraction fraction) {
         return add(new Fraction(-fraction.numerator, fraction.denominator));
     }
 
     /**
-     * Деление дроби на дробь {@code fraction}
      * @param fraction делитель
-     * @return результат деления
+     * @return результат деления - новый объект класса {@code Fraction}.
      */
     public Fraction div(Fraction fraction) {
-        return mult(new Fraction(fraction.denominator, fraction.numerator));
+        return multiplication(new Fraction(fraction.denominator, fraction.numerator));
     }
 
     /**
-     * Возведение дроби в степень равную значению дроби {@code fraction}
      * @param degree показатель степени
-     * @return результат возведения в степень - рациональная дробь
+     * @return результат возведения в степень - новый объект класса {@code Fraction}.
      */
     public Fraction pow(Fraction degree) {
         return new Fraction(
@@ -101,8 +95,8 @@ final public class Fraction {
     }
 
     /**
-     * Возвращает представление дроби как строки
-     * @return строка, как представление дроби
+     * Возвращает представление дроби как строки.
+     * @return строка, как представление дроби.
      */
     public String getString() {
         if (denominator == 1 || numerator == 0)
@@ -112,8 +106,8 @@ final public class Fraction {
     }
 
     /**
-     * Возвращает дробь как значение типа {@code double}
-     * @return значение дроби
+     * Возвращает дробь как значение типа {@code double}.
+     * @return значение дроби.
      */
     public double toDouble() {
         return 1.0 * numerator / denominator;
@@ -122,8 +116,8 @@ final public class Fraction {
     /**
      * Возвращает произвольную рациональную дробь не равную нулю,
      * числитель и знаменатель которой не больше {@code maxNumber}
-     * @param maxNumber максимальное значение числителя и знаменателя дроби
-     * @return не нулевая рациональная дробь
+     * @param maxNumber максимальное значение числителя и знаменателя дроби.
+     * @return не нулевая рациональная дробь.
      */
     static public Fraction randomNonZeroSignFraction(int maxNumber)
     {
@@ -135,8 +129,8 @@ final public class Fraction {
     /**
      * Возвращает произвольную дробь не равную нулю,
      * числитель и знаменатель которой не больше {@code maxNumber}
-     * @param maxNumber максимальное значение числителя и знаменателя дроби
-     * @return рациональная дробь
+     * @param maxNumber максимальное значение числителя и знаменателя дроби.
+     * @return рациональная дробь.
      */
     static public Fraction randomSignFraction(int maxNumber)
     {
@@ -148,5 +142,15 @@ final public class Fraction {
     @Override
     public String toString() {
         return getString();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        Fraction otherFraction;
+        if (other instanceof Fraction)
+            otherFraction = (Fraction) other;
+        else
+            return false;
+        return (numerator == otherFraction.numerator) && (denominator == otherFraction.denominator);
     }
 }

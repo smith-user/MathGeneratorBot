@@ -8,7 +8,7 @@ import storage.JsonStorage;
 import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
 import tasksGenerator.TasksGenerator;
-import tasksGenerator.taskTypes.TaskType;
+import tasksGenerator.MathTask;
 
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
 public class CommandHandler implements Command{
-    private static final TasksGenerator generator = new TasksGenerator();
+    private static final TasksGenerator generator = TasksGenerator.Instance();
 
     private static StringBuilder help_text = new StringBuilder("""
             Бот может генерировать математические задачи по заданной теме.
@@ -133,7 +133,7 @@ public class CommandHandler implements Command{
     }
 
     private void generateTasks(String type, int number) {
-        TaskType taskType;
+        MathTask taskType;
         for (int i = 0; i < number; i++) {
             taskType = generator.getNewTaskByType(type);
             TaskCondition taskCondition = taskType.getCondition();
@@ -144,7 +144,7 @@ public class CommandHandler implements Command{
     }
 
     private void generateTasks(int number) {
-        TaskType taskType;
+        MathTask taskType;
         for (int i = 0; i < number; i++) {
             taskType = generator.getNewTask();
             TaskCondition taskCondition = taskType.getCondition();
