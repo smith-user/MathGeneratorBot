@@ -18,7 +18,7 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
 public class CommandHandler implements Command{
-    private static final TasksGenerator generator = TasksGenerator.Instance();
+    private static final TasksGenerator generator = TasksGenerator.instance();
 
     private static StringBuilder help_text = new StringBuilder("""
             Бот может генерировать математические задачи по заданной теме.
@@ -144,7 +144,7 @@ public class CommandHandler implements Command{
     private void generateTasks(String type, int number) throws TaskCreationException {
         MathTask taskType;
         for (int i = 0; i < number; i++) {
-            taskType = generator.getNewTaskByType(type);
+            taskType = generator.createTaskByType(type);
             TaskCondition taskCondition = taskType.getCondition();
             TaskSolution taskSolution = taskType.getSolution();
             tasks.add(taskCondition);
@@ -155,7 +155,7 @@ public class CommandHandler implements Command{
     private void generateTasks(int number) throws TaskCreationException{
         MathTask taskType;
         for (int i = 0; i < number; i++) {
-            taskType = generator.getNewTask();
+            taskType = generator.createTask();
             TaskCondition taskCondition = taskType.getCondition();
             TaskSolution taskSolution = taskType.getSolution();
             tasks.add(taskCondition);

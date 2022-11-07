@@ -10,11 +10,11 @@ public class TasksGeneratorTest {
 
     @BeforeAll
     static void init() {
-        generator = TasksGenerator.Instance();
+        generator = TasksGenerator.instance();
     }
 
     @Test
     void testCreateTaskConditionOfCorrectClass() {
-        assertEquals(generator, TasksGenerator.Instance());
+        assertEquals(generator, TasksGenerator.instance());
     }
 }

@@ -29,12 +29,12 @@ public class RationalArithmeticManualGenerator extends RationalArithmeticGenerat
     private static final Character[] operations = operationsWithPriorities.keySet().toArray(new Character[0]);
 
     @Override
-    public MathTask getMathTask() throws TaskCreationException {
+    public MathTask createMathTask() throws TaskCreationException {
         MathTask mathTask;
         int tryingCount = 0;
         while(true) {
             try {
-                mathTask = super.getMathTask();
+                mathTask = super.createMathTask();
                 break;
             } catch (TaskCreationException e) {
                 tryingCount++;

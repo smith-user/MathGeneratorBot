@@ -19,7 +19,7 @@ abstract public class MathTaskGenerator {
      * @return сгенерированную математическую задачу.
      * @throws TaskCreationException если не удалось создать корректную задачу.
      */
-    public MathTask getMathTask() throws TaskCreationException {
+    public MathTask createMathTask() throws TaskCreationException {
         TaskCondition condition;
         TaskSolution solution;
         try {
@@ -35,7 +35,7 @@ abstract public class MathTaskGenerator {
 
     /**
      * Генерирует и возвращает условие математической задачи.
-     * Предпочтительно использование метода {@link #getMathTask() getMathTask},
+     * Предпочтительно использование метода {@link #createMathTask()},
      * так как при вызове данной функции сгенерированное уловие задачи не проверяется на возможность решения.
      * @return условие математической задачи.
      * @throws TaskConditionException если при генерации условия возникла ошибка.
@@ -44,7 +44,7 @@ abstract public class MathTaskGenerator {
 
     /**
      * Генерирует и возвращает решение математической задачи.
-     * Предпочтительно использование метода {@link #getMathTask() getMathTask}.
+     * Предпочтительно использование метода {@link #createMathTask()}.
      * @param taskCondition условие задачи. Использовать условие, сгенерированное этим же классом,
      *                      иначе возникнет исключение.
      * @return решение математической задачи.

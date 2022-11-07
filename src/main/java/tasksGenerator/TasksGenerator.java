@@ -29,7 +29,7 @@ public class TasksGenerator {
      *
      * @return объект данного класса.
      */
-    public static TasksGenerator Instance() {
+    public static TasksGenerator instance() {
         if (tasksGenerator == null)
             tasksGenerator = new TasksGenerator();
         return tasksGenerator;
@@ -49,35 +49,14 @@ public class TasksGenerator {
 
     /**
      *
-     * @param strType название типа задачи
-     * @return математическую задачу.
-     * @throws InvalidParameterException если задачи типа {@code strType} не существует.
-     * @throws TaskCreationException если класс-генератор для данного типа задач не определен или
-     * при генерации задачи возникла ошибка.
-     */
-    public MathTask getNewTaskByType(String strType) throws InvalidParameterException, TaskCreationException {
-
-        MathTaskTypes type;
-        try {
-            type = MathTaskTypes.valueOf(strType);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidParameterException(
-                    "Неверный тип задачи: \"%s\"".formatted(strType)
-            );
-        }
-        return getNewTaskByType(type);
-    }
-
-    /**
-     *
      * @param type тип задачи, которая будет сгенерирована.
      * @return математическую задачу.
      * @throws TaskCreationException если класс-генератор для данного типа задач не определен или
      * при генерации задачи возникла ошибка.
      */
-    public MathTask getNewTaskByType(MathTaskTypes type) throws TaskCreationException {
+    public MathTask createTaskByType(MathTaskTypes type) throws TaskCreationException {
         if (generatorsMap.containsKey(type))
-            return generatorsMap.get(type).getMathTask();
+            return generatorsMap.get(type).createMathTask();
         else
             throw new TaskCreationException(
                     "Класс-генератор для данного типа задач \"%s\" не определен.".formatted(type.name())
@@ -90,8 +69,8 @@ public class TasksGenerator {
      * @throws TaskCreationException если класс-генератор для данного типа задач не определен или
      * при генерации задачи возникла ошибка.
      */
-    public MathTask getNewTask() throws TaskCreationException {
+    public MathTask createTask() throws TaskCreationException {
         int rand = MathFunctions.intRandomUnsigned(generatorsMap.size() - 1);
-        return getNewTaskByType(MathTaskTypes.values()[rand]);
+        return createTaskByType(MathTaskTypes.values()[rand]);
     }
 }
