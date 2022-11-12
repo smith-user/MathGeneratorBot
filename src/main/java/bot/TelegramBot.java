@@ -39,7 +39,6 @@ public class TelegramBot extends TelegramLongPollingBot {
             message.setChatId(update.getMessage().getChatId().toString());
             message.setText(handler.getResponse(update.getMessage().getText(),
                             Math.toIntExact(update.getMessage().getChatId())));
-            System.out.println(update.getMessage().getText());
             try {
                 execute(message); // Call method to send the message
             } catch (TelegramApiException e) {
