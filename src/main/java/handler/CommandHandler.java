@@ -17,7 +17,7 @@ import java.nio.file.InvalidPathException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
-public class CommandHandler implements Command{
+public class CommandHandler{
     private static final TasksGenerator generator = TasksGenerator.instance();
 
     private static StringBuilder help_text = new StringBuilder("""
@@ -53,7 +53,7 @@ public class CommandHandler implements Command{
      * @throws InvalidParameterException Если были введены некорректные аргументы для комманды {@code TASKS}
      * @throws StorageErrorException     Если возникла ошибка в хранилище
      */
-    @Override
+
     public String processCommand(int userId, String command, String arguments)
             throws UnknownCommandException, InvalidParameterException,
                     NoGeneratedTasksException, StorageErrorException {
