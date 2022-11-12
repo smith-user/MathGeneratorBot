@@ -14,12 +14,24 @@ import tasksGenerator.TasksGenerator;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class QueryHandler {
     private static final TasksGenerator generator = TasksGenerator.Instance();
     private JsonStorage storage;
-    private ArrayList<TaskCondition> tasks = new ArrayList<>();
-    private ArrayList<TaskSolution> tasksSolution = new ArrayList<>();
+    private final LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks = new LinkedHashMap<Integer, ArrayList<TaskCondition>>() {
+        @Override
+        protected boolean removeEldestEntry(final Map.Entry eldest){
+            return size() > 5;
+        }
+    };
+    private LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution = new LinkedHashMap<Integer, ArrayList<TaskSolution>>() {
+        @Override
+        protected boolean removeEldestEntry(final Map.Entry eldest){
+            return size() > 5;
+        }
+    };
     public QueryHandler() {
         try {
             storage = new JsonStorage();

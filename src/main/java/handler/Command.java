@@ -9,16 +9,18 @@ import tasksGenerator.TasksGenerator;
 import tasksGenerator.exceptions.TaskCreationException;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 abstract public class Command{
     protected TasksGenerator generator;
     protected JsonStorage storage;
 
-    protected ArrayList<TaskCondition> tasks;
-    protected ArrayList<TaskSolution> tasksSolution;
+    protected LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks;
+    protected LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution;
 
     public Command(TasksGenerator generator, JsonStorage storage,
-                   ArrayList<TaskCondition> tasks, ArrayList<TaskSolution> tasksSolution) {
+                   LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
+                   LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution) {
         this.generator = generator;
         this.storage = storage;
         this.tasks = tasks;
