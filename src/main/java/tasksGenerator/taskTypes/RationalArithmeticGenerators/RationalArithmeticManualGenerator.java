@@ -25,28 +25,10 @@ public class RationalArithmeticManualGenerator extends RationalArithmeticGenerat
     protected static final int maxDegree = 2;
     protected static final int minUnitCount = 3;
     protected static final int maxUnitCount = 5;
-    protected static final int maxNumberOfGenerationTrying = 7;
     private static final Character[] operations = operationsWithPriorities.keySet().toArray(new Character[0]);
 
     @Override
-    public MathTask createMathTask() throws TaskCreationException {
-        MathTask mathTask;
-        int tryingCount = 0;
-        while(true) {
-            try {
-                mathTask = super.createMathTask();
-                break;
-            } catch (TaskCreationException e) {
-                tryingCount++;
-                if (tryingCount > maxNumberOfGenerationTrying)
-                    throw e;
-            }
-        }
-        return mathTask;
-    }
-
-    @Override
-    public RationalArithmeticTaskCondition createTaskConditionForRationalArithmetic() {
+    protected RationalArithmeticTaskCondition createTaskConditionForRationalArithmetic() {
         String expression = generateUnit(1, false);
         expression = expression.substring(1, expression.length() - 1);
         return new RationalArithmeticTaskCondition(expression);
@@ -64,6 +46,7 @@ public class RationalArithmeticManualGenerator extends RationalArithmeticGenerat
             throw new TaskSolutionException(exc.getMessage());
         }
         Stack<Fraction> stack = new Stack<>();
+        boolean divisionByZero = false;
         for (Object o : rpn) {
             Fraction fraction;
             if (o instanceof Fraction) {
@@ -76,7 +59,14 @@ public class RationalArithmeticManualGenerator extends RationalArithmeticGenerat
                 try{
                     fraction = calculateNewValue(operands[1], operands[0], (Character) o);
                 } catch (IllegalArgumentException exc) {
-                    throw new TaskSolutionException(exc.getMessage());
+                    steps.add("%d. Деление на ноль: %s %s %s".formatted(
+                            stepNum++,
+                            operands[1].getString(),
+                            (Character) o,
+                            operands[0].getString())
+                    );
+                    divisionByZero = true;
+                    break;
                 }
                 steps.add("%d. %s %s %s = %s".formatted(
                                 stepNum++,
@@ -92,12 +82,14 @@ public class RationalArithmeticManualGenerator extends RationalArithmeticGenerat
             stack.push(fraction);
         }
 
-        Fraction result;
-        if(stack.size() == 1)
-            result = stack.pop();
+        String result;
+        if(divisionByZero)
+            result = "-";
+        else if(stack.size() == 1)
+            result = stack.pop().getString();
         else
             throw new TaskSolutionException("Неверное выражение: %s".formatted(condition.getExpression()));
-        return new TaskSolution(String.join("\n", steps), result.getString());
+        return new TaskSolution(String.join("\n", steps), result);
     }
 
     /**
@@ -147,15 +139,7 @@ public class RationalArithmeticManualGenerator extends RationalArithmeticGenerat
             case '+' -> fstOperand.add(sndOperand);
             case '-' -> fstOperand.sub(sndOperand);
             case '*' -> fstOperand.multiplication(sndOperand);
-            case '^' -> {
-                double num = sndOperand.toDouble();
-                if (Math.abs(num - (int)num) > 10e-6)
-                    throw new IllegalArgumentException("Возведение числа не в целую степень: %s ^ %s".formatted(
-                            fstOperand.getString(),
-                            sndOperand.getString())
-                    );
-                yield fstOperand.pow(sndOperand);
-            }
+            case '^' -> fstOperand.pow(sndOperand);
             case '/' -> {
                 if (Objects.equals(sndOperand.getString(), "0"))
                     throw new IllegalArgumentException("Деление на ноль: %s / %s".formatted(
