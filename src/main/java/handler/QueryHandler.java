@@ -56,7 +56,7 @@ public class QueryHandler {
         Command command;
         switch (commandType) {
             case HELP:
-                command = new HelpCommand(generator);
+                command = new HelpCommand();
                 break;
             case START:
                 command = new StartCommand(storage);

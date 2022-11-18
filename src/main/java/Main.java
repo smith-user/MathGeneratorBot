@@ -6,16 +6,8 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 public class Main {
     public static void main(String[] args) {
-        ConsoleBot bot = new ConsoleBot();
+        //ConsoleBot bot = new ConsoleBot();
+        TelegramBot bot = new TelegramBot();
         bot.run();
-        /*
-        try {
-            TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(new TelegramBot());
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-
-         */
     }
 }

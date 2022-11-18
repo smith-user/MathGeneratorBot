@@ -2,9 +2,11 @@ package bot;
 
 import handler.QueryHandler;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,6 +22,15 @@ public class TelegramBot extends TelegramLongPollingBot {
             properties.load(fis);
             fis.close();
         } catch (IOException ignored) {}
+    }
+
+    public void run() {
+        try {
+            TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+            botsApi.registerBot(new TelegramBot());
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
