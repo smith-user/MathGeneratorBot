@@ -35,12 +35,13 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            SendMessage message = new SendMessage(); // Create a SendMessage object with mandatory fields
+            SendMessage message = new SendMessage();
+            message.enableMarkdown(true);
             message.setChatId(update.getMessage().getChatId().toString());
             message.setText(handler.getResponse(update.getMessage().getText(),
                             Math.toIntExact(update.getMessage().getChatId())));
             try {
-                execute(message); // Call method to send the message
+                execute(message);
             } catch (TelegramApiException e) {
                 e.printStackTrace();
             }

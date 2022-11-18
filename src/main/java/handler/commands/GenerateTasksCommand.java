@@ -70,7 +70,9 @@ public class GenerateTasksCommand extends Command {
 
         for (TaskCondition task : tasks.get(userId)) {
             tmpResponse.append(task.getCondition())
+                    .append("`")
                     .append(task.getExpression())
+                    .append("`")
                     .append("\n");
         }
         return tmpResponse.toString();

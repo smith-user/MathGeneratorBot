@@ -24,14 +24,24 @@ public class AnswersCommand extends Command {
             return DefaultResponse.NO_TASKS_GENERATED;
         StringBuilder tmpResponse = new StringBuilder();
         for (int i = 0; i < tasksSolution.get(userId).size(); i++) {
-            tmpResponse.append(i+1)
+            tmpResponse.append("*")
+                    .append(i+1)
                     .append(") ")
+                    .append("*")
+                    .append("`")
                     .append(tasks.get(userId).get(i).getExpression())
+                    .append("`")
                     .append("\n")
+                    .append("*")
                     .append("ответ: ")
+                    .append("*")
+                    .append("`")
                     .append(tasksSolution.get(userId).get(i).getResult())
+                    .append("`")
                     .append("\n")
+                    .append("`")
                     .append(tasksSolution.get(userId).get(i).getSolutionSteps())
+                    .append("` ")
                     .append("\n")
                     .append("\n");
         }
