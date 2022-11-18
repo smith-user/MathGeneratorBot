@@ -18,7 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class QueryHandler {
-    private static final TasksGenerator generator = TasksGenerator.Instance();
+    private static final TasksGenerator generator = TasksGenerator.instance();
     private JsonStorage storage;
     private final LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks = new LinkedHashMap<Integer, ArrayList<TaskCondition>>() {
         @Override

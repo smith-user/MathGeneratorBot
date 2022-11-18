@@ -7,13 +7,20 @@ import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
 import tasksGenerator.TasksGenerator;
 import tasksGenerator.exceptions.TaskCreationException;
+import tasksGenerator.taskTypes.MathTaskTypes;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class GenerateTasksCommand extends Command {
     private final int DEFAULT_NUMBER_OF_TASK = 5;
+
+    private final Map<String, MathTaskTypes> taskType =  Map.of(
+            "арифметика", MathTaskTypes.RATIONAL_ARITHMETIC,
+            "уравнения", MathTaskTypes.LINEAR_EQUATION
+    );
     public GenerateTasksCommand(TasksGenerator generator, LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
                                 LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution) {
         super(generator, null, tasks, tasksSolution);
@@ -42,7 +49,10 @@ public class GenerateTasksCommand extends Command {
             }
         } else {
             String[] argumentsArray = arguments.split(" ");
-            String type = argumentsArray[0];
+            String strType = argumentsArray[0];
+            MathTaskTypes type = taskType.get(strType);
+            if (type == null)
+                return DefaultResponse.ILLEGAL_TYPE_OF_TASKS;
             int number;
             try {
                 number = (argumentsArray.length > 1) ? Integer.parseInt(argumentsArray[1]) : 1;
@@ -65,11 +75,10 @@ public class GenerateTasksCommand extends Command {
         }
         return tmpResponse.toString();
     }
-
-    private void generateTasks(int userId, String type, int number) throws TaskCreationException {
+    private void generateTasks(int userId, MathTaskTypes type, int number) throws TaskCreationException {
         MathTask taskType;
         for (int i = 0; i < number; i++) {
-            taskType = generator.getNewTaskByType(type);
+            taskType = generator.createTaskByType(type);
             TaskCondition taskCondition = taskType.getCondition();
             TaskSolution taskSolution = taskType.getSolution();
             tasks.get(userId).add(taskCondition);
@@ -80,7 +89,7 @@ public class GenerateTasksCommand extends Command {
     private void generateTasks(int userId, int number) throws TaskCreationException {
         MathTask taskType;
         for (int i = 0; i < number; i++) {
-            taskType = generator.getNewTask();
+            taskType = generator.createTask();
             TaskCondition taskCondition = taskType.getCondition();
             TaskSolution taskSolution = taskType.getSolution();
             tasks.get(userId).add(taskCondition);
