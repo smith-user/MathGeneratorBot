@@ -23,6 +23,11 @@ public class AnswersCommand extends Command {
         if (tasksSolution.get(userId) == null || tasksSolution.get(userId).isEmpty())
             return DefaultResponse.NO_TASKS_GENERATED;
         StringBuilder tmpResponse = new StringBuilder();
+
+        tmpResponse.append("Решены %s из %d задач\n".formatted(rightAnswers(userId, arguments),
+                                                           tasksSolution.get(userId).size()));
+
+
         for (int i = 0; i < tasksSolution.get(userId).size(); i++) {
             tmpResponse.append("*")
                     .append(i+1)
@@ -46,5 +51,17 @@ public class AnswersCommand extends Command {
                     .append("\n");
         }
         return tmpResponse.toString();
+    }
+
+    private int rightAnswers(int userId, String answers) {
+        if (answers == null)
+            return 0;
+        String[] answersArray = answers.split(" ");
+        int answersNumber = 0;
+        for (int i = 0; i < answersArray.length; i++) {
+            if (answersArray[i].equals(tasksSolution.get(userId).get(i).getResult()))
+                answersNumber++;
+        }
+        return answersNumber;
     }
 }
