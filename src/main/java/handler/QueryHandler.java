@@ -2,10 +2,7 @@ package handler;
 
 import com.google.gson.JsonSyntaxException;
 
-import handler.commands.AnswersCommand;
-import handler.commands.GenerateTasksCommand;
-import handler.commands.HelpCommand;
-import handler.commands.StartCommand;
+import handler.commands.*;
 import storage.JsonStorage;
 import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
@@ -62,10 +59,13 @@ public class QueryHandler {
                 command = new StartCommand(storage);
                 break;
             case TASKS:
-                command = new GenerateTasksCommand(generator, tasks, tasksSolution);
+                command = new GenerateTasksCommand(generator, storage, tasks, tasksSolution);
                 break;
             case ANSWERS:
-                command = new AnswersCommand(tasks, tasksSolution);
+                command = new AnswersCommand(storage, tasks, tasksSolution);
+                break;
+            case STAT:
+                command = new StatCommand(storage);
                 break;
             default:
                 return null;

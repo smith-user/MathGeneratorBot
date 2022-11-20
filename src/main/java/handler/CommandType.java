@@ -4,5 +4,6 @@ public enum CommandType {
     TASKS,
     HELP,
     START,
-    ANSWERS
+    ANSWERS,
+    STAT
 }

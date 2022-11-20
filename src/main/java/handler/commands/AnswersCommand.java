@@ -9,13 +9,14 @@ import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
 import tasksGenerator.TasksGenerator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 public class AnswersCommand extends Command {
-    public AnswersCommand(LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
+    public AnswersCommand(JsonStorage storage, LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
                           LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution) {
-        super(null, null, tasks, tasksSolution);
+        super(null, storage, tasks, tasksSolution);
     }
 
     @Override
@@ -27,6 +28,9 @@ public class AnswersCommand extends Command {
         tmpResponse.append("Решены %s из %d задач\n".formatted(rightAnswers(userId, arguments),
                                                            tasksSolution.get(userId).size()));
 
+        try {
+            storage.updateUsersSolvedTasks(userId, rightAnswers(userId, arguments));
+        } catch (IOException ignored) {}
 
         for (int i = 0; i < tasksSolution.get(userId).size(); i++) {
             tmpResponse.append("*")

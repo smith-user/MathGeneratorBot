@@ -2,6 +2,7 @@ package handler.commands;
 
 import handler.Command;
 import handler.DefaultResponse;
+import storage.JsonStorage;
 import tasksGenerator.MathTask;
 import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
@@ -9,6 +10,7 @@ import tasksGenerator.TasksGenerator;
 import tasksGenerator.exceptions.TaskCreationException;
 import tasksGenerator.taskTypes.MathTaskTypes;
 
+import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -21,9 +23,10 @@ public class GenerateTasksCommand extends Command {
             "арифметика", MathTaskTypes.RATIONAL_ARITHMETIC,
             "уравнения", MathTaskTypes.LINEAR_EQUATION
     );
-    public GenerateTasksCommand(TasksGenerator generator, LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
+    public GenerateTasksCommand(TasksGenerator generator, JsonStorage storage,
+                                LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
                                 LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution) {
-        super(generator, null, tasks, tasksSolution);
+        super(generator, storage, tasks, tasksSolution);
     }
 
     @Override
@@ -67,6 +70,10 @@ public class GenerateTasksCommand extends Command {
                 return e.getMessage();
             }
         }
+
+        try {
+            storage.updateUsersGeneratedTasks(userId, tasks.get(userId).size());
+        } catch (IOException ignored) {}
 
         for (TaskCondition task : tasks.get(userId)) {
             tmpResponse.append(task.getCondition())

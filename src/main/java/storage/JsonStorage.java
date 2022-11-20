@@ -26,7 +26,6 @@ public class JsonStorage {
     private File file;
     private Reader reader;
     private Writer writer;
-    private static final Type listType = new TypeToken<ArrayList<User>>(){}.getType();
     private Gson gson = new GsonBuilder().create();
 
 
@@ -75,6 +74,19 @@ public class JsonStorage {
         updateJSONFile();
     }
 
+    public void updateUsersGeneratedTasks(int userId, int numberOfTasks) throws IOException {
+        usersMap.get(Integer.toString(userId)).addGeneratedTasks(numberOfTasks);
+        updateJSONFile();
+    }
+
+    public void updateUsersSolvedTasks(int userId, int numberOfTasks) throws IOException {
+        usersMap.get(Integer.toString(userId)).addSolvedTasks(numberOfTasks);
+        updateJSONFile();
+    }
+
+    public User getUserById(int userId) {
+        return usersMap.get(Integer.toString(userId));
+    }
     /**
      * Перезаписать JSON файл текущими данными, которые храняться в {@code usersMap}
      * @throws IOException Если возникла ошибка ввода-вывода при попытке записать данные в файл
@@ -100,10 +112,8 @@ public class JsonStorage {
 
     public static void main(String[] args) throws IOException {
         JsonStorage storage = new JsonStorage();
-        storage.addUser(4);
-        storage.addUser(3);
         for (User i : storage.usersMap.values()) {
-            System.out.println(i.id);
+            System.out.println(i.getGeneratedTasks());
         }
     }
 }
