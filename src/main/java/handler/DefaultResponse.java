@@ -8,4 +8,5 @@ public class DefaultResponse {
     public static final String NO_TASK_TYPE = "Введите категорию";
     public static final String ILLEGAL_NUMBER_OF_TASKS = "Некорректное число задач";
     public static final String TASK_GENERATE_FAIL = "Неудалось сгенерировать задачи";
+    public static final String ILLEGAL_TYPE_OF_TASKS = "Некорректный тип задач";
 }

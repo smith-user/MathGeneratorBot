@@ -2,10 +2,7 @@ package handler;
 
 import com.google.gson.JsonSyntaxException;
 
-import handler.commands.AnswersCommand;
-import handler.commands.GenerateTasksCommand;
-import handler.commands.HelpCommand;
-import handler.commands.StartCommand;
+import handler.commands.*;
 import storage.JsonStorage;
 import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
@@ -18,7 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class QueryHandler {
-    private static final TasksGenerator generator = TasksGenerator.Instance();
+    private static final TasksGenerator generator = TasksGenerator.instance();
     private JsonStorage storage;
     private final LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks = new LinkedHashMap<Integer, ArrayList<TaskCondition>>() {
         @Override
@@ -56,16 +53,19 @@ public class QueryHandler {
         Command command;
         switch (commandType) {
             case HELP:
-                command = new HelpCommand(generator);
+                command = new HelpCommand();
                 break;
             case START:
                 command = new StartCommand(storage);
                 break;
             case TASKS:
-                command = new GenerateTasksCommand(generator, tasks, tasksSolution);
+                command = new GenerateTasksCommand(generator, storage, tasks, tasksSolution);
                 break;
             case ANSWERS:
-                command = new AnswersCommand(tasks, tasksSolution);
+                command = new AnswersCommand(storage, tasks, tasksSolution);
+                break;
+            case STAT:
+                command = new StatCommand(storage);
                 break;
             default:
                 return null;

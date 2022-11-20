@@ -2,9 +2,11 @@ package bot;
 
 import handler.QueryHandler;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,6 +24,15 @@ public class TelegramBot extends TelegramLongPollingBot {
         } catch (IOException ignored) {}
     }
 
+    public void run() {
+        try {
+            TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+            botsApi.registerBot(new TelegramBot());
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public String getBotUsername() {
         return properties.getProperty("bot.name");
@@ -35,12 +46,13 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            SendMessage message = new SendMessage(); // Create a SendMessage object with mandatory fields
+            SendMessage message = new SendMessage();
+            message.enableMarkdown(true);
             message.setChatId(update.getMessage().getChatId().toString());
             message.setText(handler.getResponse(update.getMessage().getText(),
                             Math.toIntExact(update.getMessage().getChatId())));
             try {
-                execute(message); // Call method to send the message
+                execute(message);
             } catch (TelegramApiException e) {
                 e.printStackTrace();
             }
