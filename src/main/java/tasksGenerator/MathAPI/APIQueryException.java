@@ -1,4 +1,4 @@
-package tasksGenerator.wolframAlphaAPI;
+package tasksGenerator.MathAPI;
 
 public class APIQueryException extends Exception{
     public APIQueryException() { super(); }

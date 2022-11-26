@@ -1,4 +1,4 @@
-package tasksGenerator.taskTypes.LinearEquationGenerators;
+package tasksGenerator.taskTypes.LinearEquation;
 
 import tasksGenerator.TaskCondition;
 import tasksGenerator.mathClasses.Fraction;
@@ -7,7 +7,7 @@ import tasksGenerator.mathClasses.Fraction;
  * Данный класс расширяет и определяет {@code TaskCondition} для задач с линейными уравнениями.
  * Добавлены новые поля: коэффициент при неизвестном и свободный коэффициент в уравнении.
  */
-public class LinearEquationTaskCondition extends TaskCondition {
+final public class LinearEquationTaskCondition extends TaskCondition {
 
     private final Fraction coefficientAtX;
     private final Fraction freeCoefficient;

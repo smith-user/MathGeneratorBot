@@ -2,6 +2,10 @@ package tasksGenerator.wolframAlphaAPI;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tasksGenerator.MathAPI.wolframAlphaAPI.WolframAlphaAPI;
+import tasksGenerator.taskTypes.LinearEquation.LinearEquationManualGenerator;
+import tasksGenerator.taskTypes.LinearEquation.LinearEquationWolframSolver;
+import tasksGenerator.taskTypes.RationalArithmetic.RationalArithmeticManualGenerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,8 +28,17 @@ class WolframAlphaAPITest {
     @Test
     void performQuery() {
         assertDoesNotThrow(() -> {
-            HashMap<String, ArrayList<String>> result = alphaAPI.performQuery("x^2 -5x + 6 = 0");
-            System.out.println(result);
+            RationalArithmeticManualGenerator generator = new RationalArithmeticManualGenerator();
+            HashMap<String, ArrayList<String>> result;
+            result = alphaAPI.performQuery("12/(1-3/3)");
+            result = alphaAPI.performQuery("0/0");
+            result = alphaAPI.performQuery("12+(6-5/10*8)/0");
+            //result = alphaAPI.performQuery("0x=2");
+            for(int i = 0; i < 100; i++)
+            {
+                result = alphaAPI.performQuery(generator.createTaskCondition().getExpression());
+            }
+
         });
     }
 }

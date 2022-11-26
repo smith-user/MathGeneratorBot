@@ -5,7 +5,7 @@ package tasksGenerator;
  * которое состоит из описание того, что требуется (найти, вычислить, доказать и т.п.)
  * и математического выражения.
  */
-public class TaskCondition {
+abstract public class TaskCondition {
     private final String condition;
     private final String expression;
 

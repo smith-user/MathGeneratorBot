@@ -5,10 +5,10 @@ package tasksGenerator;
  * каждая задача состоит из условия {@code TaskCondition}
  * и решения с пояснением {@code TaskSolution}.
  */
-public class MathTask {
+final public class MathTask {
 
-    protected TaskCondition condition;
-    protected TaskSolution solution;
+    private final TaskCondition condition;
+    private final TaskSolution solution;
 
     public MathTask(TaskCondition condition, TaskSolution solution) {
         this.condition = condition;

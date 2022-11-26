@@ -1,4 +1,4 @@
-package tasksGenerator.wolframAlphaAPI;
+package tasksGenerator.MathAPI.wolframAlphaAPI;
 
 import com.wolfram.alpha.WAEngine;
 import com.wolfram.alpha.WAException;
@@ -7,19 +7,33 @@ import com.wolfram.alpha.WAPod;
 import com.wolfram.alpha.WAQuery;
 import com.wolfram.alpha.WAQueryResult;
 import com.wolfram.alpha.WASubpod;
+import tasksGenerator.MathAPI.APIQueryException;
+import tasksGenerator.MathAPI.MathAPI;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
 
-public class WolframAlphaAPI {
+public class WolframAlphaAPI implements MathAPI {
     private static WolframAlphaAPI alphaAPI;
     private final WAEngine engine;
     private WolframAlphaAPI() {
-        String appId = "22QVAA-J89WPHAPXU"; // TODO get from file
         engine = new WAEngine();
-        engine.setAppID(appId);
+        engine.setAppID(getAppId());
         engine.addFormat("plaintext");
         engine.addPodState("Result__Step-by-step solution");
+    }
+
+    private static String getAppId() {
+        Properties properties = new Properties();
+        try {
+            FileInputStream fis = new FileInputStream("src/main/resources/application.properties");
+            properties.load(fis);
+            fis.close();
+        } catch (IOException ignored) {}
+        return properties.getProperty("wolframAPI.token");
     }
 
     public static WolframAlphaAPI instance() {
@@ -28,7 +42,8 @@ public class WolframAlphaAPI {
         return alphaAPI;
     }
 
-    public HashMap<String, ArrayList<String>> performQuery(String request) throws APIQueryException{
+    @Override
+    public HashMap<String, ArrayList<String>> performQuery(String request) throws APIQueryException {
         WAQuery query = engine.createQuery();
 
         // Set properties of the query.
@@ -65,6 +80,7 @@ public class WolframAlphaAPI {
             }
         } catch (WAException e) {
             e.printStackTrace();
+            throw new APIQueryException();
         }
         return result;
     }

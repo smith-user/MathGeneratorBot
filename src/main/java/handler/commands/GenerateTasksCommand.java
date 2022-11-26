@@ -8,7 +8,6 @@ import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
 import tasksGenerator.TasksGenerator;
 import tasksGenerator.exceptions.TaskCreationException;
-import tasksGenerator.taskTypes.MathTaskTypes;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -19,9 +18,9 @@ import java.util.Map;
 public class GenerateTasksCommand extends Command {
     private final int DEFAULT_NUMBER_OF_TASK = 5;
 
-    private final Map<String, MathTaskTypes> taskType =  Map.of(
-            "арифметика", MathTaskTypes.RATIONAL_ARITHMETIC,
-            "уравнения", MathTaskTypes.LINEAR_EQUATION
+    private final Map<String, TasksGenerator.MathTaskTypes> taskType =  Map.of(
+            "арифметика", TasksGenerator.MathTaskTypes.RATIONAL_ARITHMETIC,
+            "уравнения", TasksGenerator.MathTaskTypes.LINEAR_EQUATION
     );
     public GenerateTasksCommand(TasksGenerator generator, JsonStorage storage,
                                 LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
@@ -53,7 +52,7 @@ public class GenerateTasksCommand extends Command {
         } else {
             String[] argumentsArray = arguments.split(" ");
             String strType = argumentsArray[0];
-            MathTaskTypes type = taskType.get(strType);
+            TasksGenerator.MathTaskTypes type = taskType.get(strType);
             if (type == null)
                 return DefaultResponse.ILLEGAL_TYPE_OF_TASKS;
             int number;
@@ -84,7 +83,7 @@ public class GenerateTasksCommand extends Command {
         }
         return tmpResponse.toString();
     }
-    private void generateTasks(int userId, MathTaskTypes type, int number) throws TaskCreationException {
+    private void generateTasks(int userId, TasksGenerator.MathTaskTypes type, int number) throws TaskCreationException {
         MathTask taskType;
         for (int i = 0; i < number; i++) {
             taskType = generator.createTaskByType(type);
