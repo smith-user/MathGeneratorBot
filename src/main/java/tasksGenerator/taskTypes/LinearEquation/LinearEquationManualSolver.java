@@ -1,21 +1,12 @@
-package tasksGenerator.taskTypes.LinearEquationGenerators;
+package tasksGenerator.taskTypes.LinearEquation;
 
-import tasksGenerator.TaskSolution;
 import tasksGenerator.mathClasses.Fraction;
 
+import static tasksGenerator.taskTypes.LinearEquation.LinearEquationTaskSolution.LinearEquationSolutionSpecialCases.*;
 
-public class LinearEquationManualGenerator extends LinearEquationGenerator {
-
+final public class LinearEquationManualSolver extends LinearEquationSolver{
     @Override
-    protected LinearEquationTaskCondition createTaskConditionForLinearEquation() {
-        int maxNumber = 5;
-        Fraction coefficientAtX = Fraction.randomSignFraction(maxNumber);
-        Fraction freeCoefficient = Fraction.randomSignFraction(maxNumber);
-        return new LinearEquationTaskCondition(coefficientAtX, freeCoefficient);
-    }
-
-    @Override
-    protected TaskSolution createTaskSolutionForLinearEquation(LinearEquationTaskCondition condition) {
+    public LinearEquationTaskSolution createTaskSolution(LinearEquationTaskCondition condition) {
         Fraction freeCoefficient = condition.getFreeCoefficient();
         Fraction coefficientAtX = condition.getCoefficientAtX();
         String steps = "";
@@ -31,12 +22,12 @@ public class LinearEquationManualGenerator extends LinearEquationGenerator {
 
         if (Math.abs(coefficientAtX.toDouble()) < 10e-6) {
             if (Math.abs(freeCoefficient.toDouble()) < 10e-6)
-                return new TaskSolution(steps, "x - любое число");
+                return new LinearEquationTaskSolution(steps, INFINITE_NUMBER_OF_ROOTS);
             else
-                return new TaskSolution(steps, "Корней нет");
+                return new LinearEquationTaskSolution(steps, NO_ROOTS);
         }
         Fraction result = freeCoefficient.div(coefficientAtX);
         steps += "\n%s / %s = %s".formatted(freeCoefficient, coefficientAtX, result);
-        return new TaskSolution(steps, "x = %s".formatted(result.getString()));
+        return new LinearEquationTaskSolution(steps, result.getString());
     }
 }

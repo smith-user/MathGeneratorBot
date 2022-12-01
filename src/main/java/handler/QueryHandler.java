@@ -1,34 +1,76 @@
 package handler;
 
-import handler.CommandHandlerException.NoGeneratedTasksException;
-import handler.CommandHandlerException.StorageErrorException;
-import handler.CommandHandlerException.UnknownCommandException;
+import com.google.gson.JsonSyntaxException;
 
-import java.security.InvalidParameterException;
+import handler.commands.*;
+import storage.JsonStorage;
+import tasksGenerator.TaskCondition;
+import tasksGenerator.TaskSolution;
+import tasksGenerator.TasksGenerator;
+
+import java.io.IOException;
+import java.nio.file.InvalidPathException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class QueryHandler {
-    private final Command commandHandler = new CommandHandler();
+    private static final TasksGenerator generator = TasksGenerator.instance();
+    private JsonStorage storage;
+    private final LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks = new LinkedHashMap<Integer, ArrayList<TaskCondition>>() {
+        @Override
+        protected boolean removeEldestEntry(final Map.Entry eldest){
+            return size() > 5;
+        }
+    };
+    private LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution = new LinkedHashMap<Integer, ArrayList<TaskSolution>>() {
+        @Override
+        protected boolean removeEldestEntry(final Map.Entry eldest){
+            return size() > 5;
+        }
+    };
+    public QueryHandler() {
+        try {
+            storage = new JsonStorage();
+        } catch (IOException | InvalidPathException | JsonSyntaxException e) {
+            System.exit(1);
+        }
+    }
 
-
-    /**
-     * Принимает запрос пользователя, разделяет его на комманду и аргументы
-     * и отправляет их на обработку в {@code CommandHandler}
-     * @param userQuery Запрос пользователя
-     * @param userId id пользователя
-     * @return Ответ пользователю
-     */
     public String getResponse(String userQuery, int userId) {
+
         String[] userQueryArray = userQuery.split(" ", 2);
-        String command = userQueryArray[0];
+        String userCommand = userQueryArray[0];
         String arguments = (userQueryArray.length > 1) ? userQueryArray[1] : null;
         String response;
+        CommandType commandType;
         try {
-            response = commandHandler.processCommand(userId, command, arguments);
-        } catch (InvalidParameterException | StorageErrorException |
-                NoGeneratedTasksException | UnknownCommandException e) {
-            response = e.getMessage();
+            commandType = CommandType.valueOf(userCommand.substring(1).toUpperCase());
+        } catch (IllegalArgumentException | StringIndexOutOfBoundsException e) {
+            response = DefaultResponse.UNKNOWN_COMMAND;
+            return response;
         }
-
+        Command command;
+        switch (commandType) {
+            case HELP:
+                command = new HelpCommand();
+                break;
+            case START:
+                command = new StartCommand(storage);
+                break;
+            case TASKS:
+                command = new GenerateTasksCommand(generator, storage, tasks, tasksSolution);
+                break;
+            case ANSWERS:
+                command = new AnswersCommand(storage, tasks, tasksSolution);
+                break;
+            case STAT:
+                command = new StatCommand(storage);
+                break;
+            default:
+                return null;
+        }
+        response = command.execute(userId, arguments);
         return response;
     }
 }

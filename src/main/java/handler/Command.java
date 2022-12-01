@@ -2,23 +2,30 @@ package handler;
 
 import handler.CommandHandlerException.NoGeneratedTasksException;
 import handler.CommandHandlerException.StorageErrorException;
-import handler.CommandHandlerException.UnknownCommandException;
+import storage.JsonStorage;
+import tasksGenerator.TaskCondition;
+import tasksGenerator.TaskSolution;
+import tasksGenerator.TasksGenerator;
+import tasksGenerator.exceptions.TaskCreationException;
 
-import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
-public interface Command{
-    /**
-     * @param userId id пользователя
-     * @param command команда, отправленная пользователем
-     * @param arguments аргументы команды
-     * @return строка, ответ пользователю
-     * @throws UnknownCommandException   Если пользователь отправил неизвестную команду
-     * @throws NoGeneratedTasksException Если перед вызовом команды {@code ANSWERS}
-     *          не была вызвна команда {@code TASKS}
-     * @throws InvalidParameterException Если были введены некорректные аргументы для комманды {@code TASKS}
-     * @throws StorageErrorException Если возникла ошибка в хранилище
-     */
-    String processCommand(int userId, String command, String arguments)
-            throws UnknownCommandException, NoGeneratedTasksException,
-            InvalidParameterException, StorageErrorException;
+abstract public class Command{
+    protected TasksGenerator generator;
+    protected JsonStorage storage;
+
+    protected LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks;
+    protected LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution;
+
+    public Command(TasksGenerator generator, JsonStorage storage,
+                   LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
+                   LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution) {
+        this.generator = generator;
+        this.storage = storage;
+        this.tasks = tasks;
+        this.tasksSolution = tasksSolution;
+    }
+
+    abstract public String execute(int userId, String arguments);
 }

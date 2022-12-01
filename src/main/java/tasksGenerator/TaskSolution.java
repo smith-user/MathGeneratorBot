@@ -4,9 +4,10 @@ package tasksGenerator;
  * Класс, представлющий собой решение математической задачи,
  * которое состоит из ответа и пошагового решения или пояснения.
  */
-public class TaskSolution {
+abstract public class TaskSolution {
     private final String solutionSteps;
     private final String result;
+    private final static String EmptySolutionSteps = "";
 
     /**
      *
@@ -23,7 +24,7 @@ public class TaskSolution {
      * @param result строка ответа к задаче
      */
     public TaskSolution(String result) {
-        this("", result);
+        this(EmptySolutionSteps, result);
     }
 
     /**

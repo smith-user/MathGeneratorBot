@@ -1,6 +1,10 @@
 # Default ignored files
 /shelf/
 /.idea/workspace.xml
+resources
 
 /.idea
-/target
+target
+
+#Ignore private info
+src/main/resources/application.properties
