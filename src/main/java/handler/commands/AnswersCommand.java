@@ -1,13 +1,10 @@
 package handler.commands;
 
 import handler.Command;
-import handler.CommandHandlerException.NoGeneratedTasksException;
-import handler.CommandHandlerException.StorageErrorException;
 import handler.DefaultResponse;
 import storage.JsonStorage;
 import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
-import tasksGenerator.TasksGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,27 +29,10 @@ public class AnswersCommand extends Command {
             storage.updateUsersSolvedTasks(userId, rightAnswers(userId, arguments));
         } catch (IOException ignored) {}
 
-        for (int i = 0; i < tasksSolution.get(userId).size(); i++) {
-            tmpResponse.append("*")
-                    .append(i+1)
-                    .append(") ")
-                    .append("*")
-                    .append("`")
-                    .append(tasks.get(userId).get(i).getExpression())
-                    .append("`")
-                    .append("\n")
-                    .append("*")
-                    .append("ответ: ")
-                    .append("*")
-                    .append("`")
-                    .append(tasksSolution.get(userId).get(i).getResult())
-                    .append("`")
-                    .append("\n")
-                    .append("`")
-                    .append(tasksSolution.get(userId).get(i).getSolutionSteps())
-                    .append("` ")
-                    .append("\n")
-                    .append("\n");
+        for (int i = 0; i < getSolutionNumber(userId); i++) {
+            tmpResponse.append("*%d)* `%s`\n".formatted(i+1, tasks.get(userId).get(i).getExpression()))
+                    .append("*ответ: *`%s`\n".formatted(tasksSolution.get(userId).get(i).getResult()))
+                    .append("`%s`\n".formatted(tasksSolution.get(userId).get(i).getSolutionSteps()));
         }
         return tmpResponse.toString();
     }
@@ -67,5 +47,9 @@ public class AnswersCommand extends Command {
                 answersNumber++;
         }
         return answersNumber;
+    }
+
+    private int getSolutionNumber(int userId) {
+        return tasksSolution.get(userId).size();
     }
 }

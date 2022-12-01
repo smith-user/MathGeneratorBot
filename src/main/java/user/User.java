@@ -2,11 +2,9 @@ package user;
 
 public class User {
 
-    private int id;
+    private final int id;
     private int solvedTasks;
     private int generatedTasks;
-
-    public User() {};
 
     public User(int userId) {
         this.id = userId;

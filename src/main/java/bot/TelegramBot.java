@@ -14,13 +14,13 @@ import java.util.Properties;
 
 public class TelegramBot extends TelegramLongPollingBot {
     private QueryHandler handler = new QueryHandler();
+    private final String BOT_NAME = "bot.name";
+    private final String BOT_TOKEN = "bot.token";
     Properties properties = new Properties();
 
     public TelegramBot() {
-        try {
-            FileInputStream fis = new FileInputStream("src/main/resources/application.properties");
+        try (FileInputStream fis = new FileInputStream("src/main/resources/application.properties")) {
             properties.load(fis);
-            fis.close();
         } catch (IOException ignored) {}
     }
 
@@ -35,12 +35,12 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return properties.getProperty("bot.name");
+        return properties.getProperty(BOT_NAME);
     }
 
     @Override
     public String getBotToken() {
-        return properties.getProperty("bot.token");
+        return properties.getProperty(BOT_TOKEN);
     }
 
     @Override
