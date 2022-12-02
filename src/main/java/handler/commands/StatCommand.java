@@ -1,12 +1,11 @@
 package handler.commands;
 
-import handler.Command;
 import storage.JsonStorage;
 import user.User;
 
 public class StatCommand extends Command {
     public StatCommand(JsonStorage storage) {
-        super(null, storage, null, null);
+        super(storage);
     }
 
     @Override

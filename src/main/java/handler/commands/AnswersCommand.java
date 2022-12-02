@@ -1,6 +1,5 @@
 package handler.commands;
 
-import handler.Command;
 import handler.DefaultResponse;
 import storage.JsonStorage;
 import tasksGenerator.TaskCondition;
@@ -10,10 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-public class AnswersCommand extends Command {
+public class AnswersCommand extends TasksCommand {
     public AnswersCommand(JsonStorage storage, LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
                           LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution) {
-        super(null, storage, tasks, tasksSolution);
+        super(storage, tasks, tasksSolution);
     }
 
     @Override

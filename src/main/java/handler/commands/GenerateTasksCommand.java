@@ -1,6 +1,5 @@
 package handler.commands;
 
-import handler.Command;
 import handler.DefaultResponse;
 import storage.JsonStorage;
 import tasksGenerator.MathTask;
@@ -15,8 +14,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class GenerateTasksCommand extends Command {
+public class GenerateTasksCommand extends TasksCommand {
     private final int DEFAULT_NUMBER_OF_TASK = 5;
+    private TasksGenerator generator;
 
     private final Map<String, TasksGenerator.MathTaskTypes> taskType =  Map.of(
             "арифметика", TasksGenerator.MathTaskTypes.RATIONAL_ARITHMETIC,
@@ -25,7 +25,8 @@ public class GenerateTasksCommand extends Command {
     public GenerateTasksCommand(TasksGenerator generator, JsonStorage storage,
                                 LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
                                 LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution) {
-        super(generator, storage, tasks, tasksSolution);
+        super(storage, tasks, tasksSolution);
+        this.generator = generator;
     }
 
     @Override

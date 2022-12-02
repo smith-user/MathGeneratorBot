@@ -1,17 +1,14 @@
 package handler.commands;
 
-import handler.Command;
-import handler.CommandHandlerException.StorageErrorException;
 import handler.DefaultResponse;
 import storage.JsonStorage;
-import tasksGenerator.exceptions.TaskCreationException;
 
 import java.io.IOException;
 
 public class StartCommand extends Command {
 
     public StartCommand(JsonStorage storage) {
-        super(null, storage, null, null);
+        super(storage);
     }
 
     @Override

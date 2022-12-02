@@ -1,9 +1,5 @@
 package handler.commands;
 
-import handler.Command;
-import storage.JsonStorage;
-import tasksGenerator.TasksGenerator;
-
 public class HelpCommand extends Command {
     private static String help_text = """
             Бот может генерировать математические задачи по заданной теме.
@@ -14,7 +10,7 @@ public class HelpCommand extends Command {
             Возможные типы задач: `арифметика`, `уравения`""";
 
     public HelpCommand() {
-        super(null, null, null, null);
+        super(null);
     }
 
 

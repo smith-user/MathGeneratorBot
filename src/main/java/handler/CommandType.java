@@ -5,5 +5,6 @@ public enum CommandType {
     HELP,
     START,
     ANSWERS,
-    STAT
+    STAT,
+    SOLVE;
 }
