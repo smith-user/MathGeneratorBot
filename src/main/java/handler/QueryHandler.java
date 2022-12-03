@@ -11,12 +11,16 @@ import tasksGenerator.TasksGenerator;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class QueryHandler {
     private static final TasksGenerator generator = TasksGenerator.instance();
     private JsonStorage storage;
+    private HashMap<Integer, HandlerState> state = new HashMap<Integer, HandlerState>();
+
+    private TasksGenerator.MathTaskTypes taskType;
     private final LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks = new LinkedHashMap<Integer, ArrayList<TaskCondition>>() {
         @Override
         protected boolean removeEldestEntry(final Map.Entry eldest){
@@ -37,20 +41,31 @@ public class QueryHandler {
         }
     }
 
-    public String getResponse(String userQuery, int userId) {
+    public HandlerState getState(int userId) {
+        return state.get(userId);
+    }
 
-        String[] userQueryArray = userQuery.split(" ", 2);
-        String userCommand = userQueryArray[0];
-        String arguments = (userQueryArray.length > 1) ? userQueryArray[1] : null;
-        String response;
-        CommandType commandType;
-        try {
-            commandType = CommandType.valueOf(userCommand.substring(1).toUpperCase());
-        } catch (IllegalArgumentException | StringIndexOutOfBoundsException e) {
-            response = DefaultResponse.UNKNOWN_COMMAND;
-            return response;
-        }
+    public String getResponse(String userQuery, Integer userId) {
         Command command;
+        CommandType commandType = null;
+        if (!state.containsKey(userId)) {
+            state.put(userId, HandlerState.COMMAND_WAITING);
+        }
+
+        if (state.get(userId) == HandlerState.COMMAND_WAITING) {
+            try {
+                commandType = CommandType.valueOf(userQuery.substring(1).toUpperCase());
+                System.out.println(1);
+            } catch (IllegalArgumentException | StringIndexOutOfBoundsException e) {
+                return DefaultResponse.UNKNOWN_COMMAND;
+            }
+        } else if (state.get(userId) == HandlerState.ANSWER_WAITING) {
+            System.out.println(2);
+            commandType = CommandType.ANSWERS;
+        } else if (state.get(userId) == HandlerState.TASK_TYPE_WAITING)
+            commandType = CommandType.TASKS;
+        System.out.println(state);
+        System.out.println(commandType);
         switch (commandType) {
             case HELP:
                 command = new HelpCommand();
@@ -59,10 +74,10 @@ public class QueryHandler {
                 command = new StartCommand(storage);
                 break;
             case TASKS:
-                command = new GenerateTasksCommand(generator, storage, tasks, tasksSolution);
+                command = new GenerateTasksCommand(generator, storage, state.get(userId), tasks, tasksSolution);
                 break;
             case ANSWERS:
-                command = new AnswersCommand(storage, tasks, tasksSolution);
+                command = new AnswersCommand(storage, state.get(userId), tasks, tasksSolution);
                 break;
             case STAT:
                 command = new StatCommand(storage);
@@ -70,7 +85,8 @@ public class QueryHandler {
             default:
                 return null;
         }
-        response = command.execute(userId, arguments);
+        String response = command.execute(userId, userQuery);
+        state.put(userId, command.getState());
         return response;
     }
 }

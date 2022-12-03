@@ -5,13 +5,20 @@ public enum HandlerState {
     COMMAND_WAITING {
         @Override
         public HandlerState nextState(CommandType command) {
-            if (command == CommandType.TASKS)
-                return TASK_TYPE_WAITING;
-            if (command == CommandType.ANSWERS)
-                return ANSWER_WAITING;
-            if (command == CommandType.SOLVE)
-                return USERS_TASK_WAITING;
-            return this;
+            switch (command) {
+                case TASKS -> {
+                    return TASK_TYPE_WAITING;
+                }
+                case ANSWERS -> {
+                    return ANSWER_WAITING;
+                }
+                case SOLVE -> {
+                    return USERS_TASK_WAITING;
+                }
+                default -> {
+                    return this;
+                }
+            }
         }
     },
     ANSWER_WAITING {
@@ -22,13 +29,6 @@ public enum HandlerState {
     },
 
     TASK_TYPE_WAITING {
-        @Override
-        public HandlerState nextState(CommandType command) {
-            return NUMBER_OF_TASKS_WAITING;
-        }
-    },
-
-    NUMBER_OF_TASKS_WAITING {
         @Override
         public HandlerState nextState(CommandType command) {
             return COMMAND_WAITING;
@@ -43,4 +43,12 @@ public enum HandlerState {
     };
 
     public abstract HandlerState nextState(CommandType command);
+
+    public static void main(String[] args) {
+        HandlerState state = HandlerState.ANSWER_WAITING;
+        System.out.println(state);
+        state.nextState(CommandType.TASKS);
+        System.out.println(state);
+    }
+
     }

@@ -1,5 +1,6 @@
 package handler.commands;
 
+import handler.HandlerState;
 import storage.JsonStorage;
 
 abstract public class Command{
@@ -12,4 +13,5 @@ abstract public class Command{
     }
 
     abstract public String execute(int userId, String arguments);
+    abstract public HandlerState getState();
 }

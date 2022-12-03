@@ -1,5 +1,7 @@
 package handler.commands;
 
+import handler.HandlerState;
+
 public class HelpCommand extends Command {
     private static String help_text = """
             Бот может генерировать математические задачи по заданной теме.
@@ -18,4 +20,11 @@ public class HelpCommand extends Command {
     public String execute(int userId, String arguments) {
         return help_text;
     }
+
+    @Override
+    public HandlerState getState() {
+        return null;
+    }
+
+
 }
