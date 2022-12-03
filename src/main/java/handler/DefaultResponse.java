@@ -9,4 +9,5 @@ public class DefaultResponse {
     public static final String TASK_GENERATE_FAIL = "Не удалось сгенерировать задачи";
     public static final String ILLEGAL_TYPE_OF_TASKS = "Некорректный тип задач";
     public static final String GET_TASK_TYPE = "Введите тип задачи (арифметика, уравнения)";
+    public static final String GET_ANSWERS = "Введитие ответы к задачам (через пробел)";
 }

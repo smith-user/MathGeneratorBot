@@ -1,5 +1,6 @@
 package handler.commands;
 
+import handler.CommandType;
 import handler.DefaultResponse;
 import handler.HandlerState;
 import storage.JsonStorage;
@@ -19,23 +20,32 @@ public class AnswersCommand extends TasksCommand {
 
     @Override
     public String execute(int userId, String arguments) {
-        if (tasksSolution.get(userId) == null || tasksSolution.get(userId).isEmpty())
-            return DefaultResponse.NO_TASKS_GENERATED;
-        StringBuilder tmpResponse = new StringBuilder();
 
-        tmpResponse.append("Решены %s из %d задач\n".formatted(rightAnswers(userId, arguments),
-                                                           tasksSolution.get(userId).size()));
-
-        try {
-            storage.updateUsersSolvedTasks(userId, rightAnswers(userId, arguments));
-        } catch (IOException ignored) {}
-
-        for (int i = 0; i < getSolutionNumber(userId); i++) {
-            tmpResponse.append("*%d)* `%s`\n".formatted(i+1, tasks.get(userId).get(i).getExpression()))
-                    .append("*ответ: *`%s`\n".formatted(tasksSolution.get(userId).get(i).getResult()))
-                    .append("`%s`\n".formatted(tasksSolution.get(userId).get(i).getSolutionSteps()));
+        if (state == HandlerState.COMMAND_WAITING) {
+            state = state.nextState(CommandType.ANSWERS);
+            return DefaultResponse.GET_ANSWERS;
         }
-        return tmpResponse.toString();
+        if (state == HandlerState.ANSWER_WAITING) {
+            if (tasksSolution.get(userId) == null || tasksSolution.get(userId).isEmpty())
+                return DefaultResponse.NO_TASKS_GENERATED;
+            StringBuilder tmpResponse = new StringBuilder();
+
+            tmpResponse.append("Решены %s из %d задач\n".formatted(rightAnswers(userId, arguments),
+                    tasksSolution.get(userId).size()));
+
+            try {
+                storage.updateUsersSolvedTasks(userId, rightAnswers(userId, arguments));
+            } catch (IOException ignored) {
+            }
+
+            for (int i = 0; i < getSolutionNumber(userId); i++) {
+                tmpResponse.append("*%d)* `%s`\n".formatted(i + 1, tasks.get(userId).get(i).getExpression()))
+                        .append("*ответ: *`%s`\n".formatted(tasksSolution.get(userId).get(i).getResult()))
+                        .append("`%s`\n".formatted(tasksSolution.get(userId).get(i).getSolutionSteps()));
+            }
+            return tmpResponse.toString();
+        }
+        return null;
     }
 
     private int rightAnswers(int userId, String answers) {
