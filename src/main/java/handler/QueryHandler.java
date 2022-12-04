@@ -55,17 +55,14 @@ public class QueryHandler {
         if (state.get(userId) == HandlerState.COMMAND_WAITING) {
             try {
                 commandType = CommandType.valueOf(userQuery.substring(1).toUpperCase());
-                System.out.println(1);
             } catch (IllegalArgumentException | StringIndexOutOfBoundsException e) {
                 return DefaultResponse.UNKNOWN_COMMAND;
             }
         } else if (state.get(userId) == HandlerState.ANSWER_WAITING) {
-            System.out.println(2);
             commandType = CommandType.ANSWERS;
         } else if (state.get(userId) == HandlerState.TASK_TYPE_WAITING)
             commandType = CommandType.TASKS;
-        System.out.println(state);
-        System.out.println(commandType);
+
         switch (commandType) {
             case HELP:
                 command = new HelpCommand();
@@ -86,7 +83,8 @@ public class QueryHandler {
                 return null;
         }
         String response = command.execute(userId, userQuery);
-        state.put(userId, command.getState());
+        if (command instanceof TasksCommand)
+            state.put(userId, command.getState());
         return response;
     }
 }

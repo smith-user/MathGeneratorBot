@@ -20,16 +20,16 @@ public class AnswersCommand extends TasksCommand {
 
     @Override
     public String execute(int userId, String arguments) {
+        if (tasksSolution.get(userId) == null || tasksSolution.get(userId).isEmpty())
+            return DefaultResponse.NO_TASKS_GENERATED;
 
         if (state == HandlerState.COMMAND_WAITING) {
             state = state.nextState(CommandType.ANSWERS);
             return DefaultResponse.GET_ANSWERS;
         }
         if (state == HandlerState.ANSWER_WAITING) {
-            if (tasksSolution.get(userId) == null || tasksSolution.get(userId).isEmpty())
-                return DefaultResponse.NO_TASKS_GENERATED;
+            state = state.nextState(CommandType.ANSWERS);
             StringBuilder tmpResponse = new StringBuilder();
-
             tmpResponse.append("Решены %s из %d задач\n".formatted(rightAnswers(userId, arguments),
                     tasksSolution.get(userId).size()));
 
