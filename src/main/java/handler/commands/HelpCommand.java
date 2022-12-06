@@ -1,7 +1,5 @@
 package handler.commands;
 
-import handler.HandlerState;
-
 /**
  * Команада, возвращающая {@code help_text}
  */
@@ -23,11 +21,4 @@ public class HelpCommand extends Command {
     public String execute(int userId, String arguments) {
         return help_text;
     }
-
-    @Override
-    public HandlerState getState() {
-        return null;
-    }
-
-
 }

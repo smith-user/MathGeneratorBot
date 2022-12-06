@@ -1,6 +1,5 @@
 package handler.commands;
 
-import handler.HandlerState;
 import storage.JsonStorage;
 import user.User;
 
@@ -17,10 +16,5 @@ public class StatCommand extends Command {
         return "Всего вы сгенерировали *%d* задач и решили из них *%d* задач".formatted(
                 user.getGeneratedTasks(), user.getSolvedTasks()
         );
-    }
-
-    @Override
-    public HandlerState getState() {
-        return null;
     }
 }

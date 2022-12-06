@@ -25,7 +25,7 @@ public abstract class TasksCommand extends Command{
         this.tasksSolution = tasksSolution;
         this.state = state;
     }
-
+    @Override
     public HandlerState getState() {
         return state;
     }

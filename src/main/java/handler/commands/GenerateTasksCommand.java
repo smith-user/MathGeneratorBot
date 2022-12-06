@@ -10,6 +10,7 @@ import tasksGenerator.TaskSolution;
 import tasksGenerator.TasksGenerator;
 import tasksGenerator.exceptions.TaskCreationException;
 
+import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -52,14 +53,7 @@ public class GenerateTasksCommand extends TasksCommand {
                 return DefaultResponse.ILLEGAL_NUMBER_OF_TASKS;
             }
 
-            if (tasks.containsKey(userId))
-                tasks.get(userId).clear();
-            else
-                tasks.put(userId, new ArrayList<TaskCondition>());
-            if (tasksSolution.containsKey(userId))
-                tasksSolution.get(userId).clear();
-            else
-                tasksSolution.put(userId, new ArrayList<TaskSolution>());
+            clearUserPreviousTasks(userId);
 
             try {
                 generateTasks(userId, type, numberOfTasks);
@@ -68,6 +62,11 @@ public class GenerateTasksCommand extends TasksCommand {
             } catch (InvalidParameterException e) {
                 return e.getMessage();
             }
+
+            try {
+                storage.updateUsersGeneratedTasks(userId, numberOfTasks);
+            } catch (IOException ignored) {}
+
             state = state.nextState(CommandType.TASKS);
             return getAnswerString(userId);
         }
@@ -91,15 +90,20 @@ public class GenerateTasksCommand extends TasksCommand {
         }
     }
 
-    private void generateTasks(int userId, int number) throws TaskCreationException {
-        MathTask taskType;
-        for (int i = 0; i < number; i++) {
-            taskType = generator.createTask();
-            TaskCondition taskCondition = taskType.getCondition();
-            TaskSolution taskSolution = taskType.getSolution();
-            tasks.get(userId).add(taskCondition);
-            tasksSolution.get(userId).add(taskSolution);
-        }
+    /**
+     * очищает массив задач которые генерировал пользователь,
+     * и создает пустой массив если пользователь еще ни разу не генерировал задачи
+     * @param userId id пользователя
+     */
+    private void clearUserPreviousTasks(int userId) {
+        if (tasks.containsKey(userId))
+            tasks.get(userId).clear();
+        else
+            tasks.put(userId, new ArrayList<TaskCondition>());
+        if (tasksSolution.containsKey(userId))
+            tasksSolution.get(userId).clear();
+        else
+            tasksSolution.put(userId, new ArrayList<TaskSolution>());
     }
 
     /**

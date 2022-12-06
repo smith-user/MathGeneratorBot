@@ -1,7 +1,6 @@
 package handler.commands;
 
 import handler.DefaultResponse;
-import handler.HandlerState;
 import storage.JsonStorage;
 
 import java.io.IOException;
@@ -23,10 +22,5 @@ public class StartCommand extends Command {
             return DefaultResponse.USER_IDENTIFICATION_FAIL;
         }
         return DefaultResponse.USER_IDENTIFICATION_SUCCESS;
-    }
-
-    @Override
-    public HandlerState getState() {
-        return null;
     }
 }

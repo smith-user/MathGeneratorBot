@@ -107,8 +107,7 @@ public class QueryHandler {
                 return null;
         }
         String response = command.execute(userId, userQuery);
-        if (command instanceof TasksCommand)
-            state.put(userId, command.getState());
+        state.put(userId, command.getState());
         return response;
     }
 }

@@ -24,7 +24,9 @@ abstract public class Command{
     abstract public String execute(int userId, String arguments);
 
     /**
-     * @return возвращает измененное состояние обработчика
+     * @return возвращает состояние обработчика
      */
-    abstract public HandlerState getState();
+    public HandlerState getState() {
+        return HandlerState.COMMAND_WAITING;
+    }
 }
