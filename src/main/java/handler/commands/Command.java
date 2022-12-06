@@ -3,6 +3,9 @@ package handler.commands;
 import handler.HandlerState;
 import storage.JsonStorage;
 
+/**
+ * Абстракный класс для реализации классов команд бота.
+ */
 abstract public class Command{
 
     protected JsonStorage storage;
@@ -12,6 +15,16 @@ abstract public class Command{
 
     }
 
+    /**
+     * Метод, выполняющий соответсвующую команду бота
+     * @param userId id пользователя
+     * @param arguments аргументы команды
+     * @return строка - результат выполнения команды
+     */
     abstract public String execute(int userId, String arguments);
+
+    /**
+     * @return возвращает измененное состояние обработчика
+     */
     abstract public HandlerState getState();
 }

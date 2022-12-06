@@ -2,6 +2,9 @@ package handler.commands;
 
 import handler.HandlerState;
 
+/**
+ * Команада, возвращающая {@code help_text}
+ */
 public class HelpCommand extends Command {
     private static String help_text = """
             Бот может генерировать математические задачи по заданной теме.

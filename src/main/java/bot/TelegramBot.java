@@ -65,6 +65,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
+    /**
+     * формирует клавиатуру в чате с tg ботом
+     * @param state состояние обработчика {@code QueryHandler}
+     * @return объект клавиатуры
+     */
     private ReplyKeyboardMarkup keyboardInit(HandlerState state) {
         ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
         keyboard.setResizeKeyboard(true);

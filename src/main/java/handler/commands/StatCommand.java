@@ -4,11 +4,13 @@ import handler.HandlerState;
 import storage.JsonStorage;
 import user.User;
 
+/**
+ * Команда, возвращающая статистику пользователя.
+ */
 public class StatCommand extends Command {
     public StatCommand(JsonStorage storage) {
         super(storage);
     }
-
     @Override
     public String execute(int userId, String arguments) {
         User user = storage.getUserById(userId);

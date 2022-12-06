@@ -6,6 +6,9 @@ import storage.JsonStorage;
 
 import java.io.IOException;
 
+/**
+ * Команда, добавляющая пользователя в хранилище {@code JsonStorage}.
+ */
 public class StartCommand extends Command {
 
     public StartCommand(JsonStorage storage) {

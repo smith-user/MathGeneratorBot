@@ -1,7 +1,12 @@
 package handler;
 
+/**
+ * Класс, содержащий состояния обработчика.
+ */
 public enum HandlerState {
-
+    /**
+     * Обработчик ожидает одну из доступных комманд {@code CommandType}
+     */
     COMMAND_WAITING {
         @Override
         public HandlerState nextState(CommandType command) {
@@ -21,6 +26,9 @@ public enum HandlerState {
             }
         }
     },
+    /**
+     * Обработчкик ожидает ответы для задач, сгененрированных командой {@code CommandType.TASKS}
+     */
     ANSWER_WAITING {
         @Override
         public HandlerState nextState(CommandType command) {
@@ -28,13 +36,19 @@ public enum HandlerState {
         }
     },
 
+    /**
+     * Обработчик ожидает тип {@code TaskGenerator.MathTaskTypes}
+     * и количество задач для команды {@code CommandType.TASKS}
+     */
     TASK_TYPE_WAITING {
         @Override
         public HandlerState nextState(CommandType command) {
             return COMMAND_WAITING;
         }
     },
-
+    /**
+     * Обработчик ожидает пользовательскую задачу для команды {@code CommandType.SOLVE}
+     */
     USERS_TASK_WAITING {
         @Override
         public HandlerState nextState(CommandType command) {

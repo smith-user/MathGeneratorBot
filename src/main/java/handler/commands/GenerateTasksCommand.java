@@ -72,7 +72,14 @@ public class GenerateTasksCommand extends TasksCommand {
             return getAnswerString(userId);
         }
         return null;
-        }
+    }
+
+    /**
+     * @param userId id пользователя
+     * @param type тип задач, которые нужно сгенерировать {@code TaskGenerator.MathTaskType}
+     * @param number количество задач, которые нужно сгенерировать
+     * @throws TaskCreationException Если при генерации возникла ошибка
+     */
     private void generateTasks(int userId, TasksGenerator.MathTaskTypes type, int number) throws TaskCreationException {
         MathTask taskType;
         for (int i = 0; i < number; i++) {
@@ -95,6 +102,10 @@ public class GenerateTasksCommand extends TasksCommand {
         }
     }
 
+    /**
+     * @param userId
+     * @return результат выполнения команды в виде строки
+     */
     private String getAnswerString(int userId) {
         StringBuilder tmpResponse = new StringBuilder();
         for (TaskCondition task : tasks.get(userId)) {

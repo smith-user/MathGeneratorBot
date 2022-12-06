@@ -8,6 +8,9 @@ import tasksGenerator.TaskSolution;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+/**
+ * Абстрактный класс для комманд бота, работающих с математическими задачами.
+ */
 public abstract class TasksCommand extends Command{
     protected LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks;
     protected LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution;

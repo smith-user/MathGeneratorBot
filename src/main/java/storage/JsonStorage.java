@@ -4,16 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-
 import user.User;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,16 +71,32 @@ public class JsonStorage {
         updateJSONFile();
     }
 
+    /**
+     * обновляет количество сгенерированных пользователем задач в файле Json
+     * @param userId id пользовтеля
+     * @param numberOfTasks количество сгенерированных пользователем задач
+     * @throws IOException Если при попытке записать данные в файл Json возникла ошибка
+     */
     public void updateUsersGeneratedTasks(int userId, int numberOfTasks) throws IOException {
         usersMap.get(Integer.toString(userId)).addGeneratedTasks(numberOfTasks);
         updateJSONFile();
     }
-
+    /**
+     * обновляет количество решенных пользователем задач в файле Json
+     * @param userId id пользовтеля
+     * @param numberOfTasks количество решенных пользователем задач
+     * @throws IOException Если при попытке записать данные в файл Json возникла ошибка
+     */
     public void updateUsersSolvedTasks(int userId, int numberOfTasks) throws IOException {
         usersMap.get(Integer.toString(userId)).addSolvedTasks(numberOfTasks);
         updateJSONFile();
     }
 
+    /**
+     * возвращает объект пользователя {@code User}
+     * @param userId id пользователя
+     * @return объект пользователя {@code User}
+     */
     public User getUserById(int userId) {
         return usersMap.get(Integer.toString(userId));
     }

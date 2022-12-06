@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+/**
+ * Команда, проверяущая ответы пользователя на задачи и выводящая ответы к этим задачам.
+ */
 public class AnswersCommand extends TasksCommand {
     public AnswersCommand(JsonStorage storage, HandlerState state,
                           LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
@@ -48,6 +51,11 @@ public class AnswersCommand extends TasksCommand {
         return null;
     }
 
+    /**
+     * @param userId id пользователя
+     * @param answers ответы пользователя на сгенерированные задачи
+     * @return количество правильных ответов пользователя
+     */
     private int rightAnswers(int userId, String answers) {
         if (answers == null)
             return 0;
