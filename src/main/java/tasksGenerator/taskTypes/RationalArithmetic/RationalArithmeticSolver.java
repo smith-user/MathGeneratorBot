@@ -1,10 +1,10 @@
 package tasksGenerator.taskTypes.RationalArithmetic;
 
+import tasksGenerator.ProblemSolverImpl;
 import tasksGenerator.exceptions.TaskSolutionException;
-import tasksGenerator.ProblemSolver;
 
-abstract public class RationalArithmeticSolver implements
-        ProblemSolver<RationalArithmeticTaskSolution, RationalArithmeticTaskCondition> {
+abstract public class RationalArithmeticSolver extends
+        ProblemSolverImpl<RationalArithmeticTaskSolution, RationalArithmeticTaskCondition> {
     @Override
     abstract public RationalArithmeticTaskSolution createTaskSolution(RationalArithmeticTaskCondition condition)
             throws TaskSolutionException;

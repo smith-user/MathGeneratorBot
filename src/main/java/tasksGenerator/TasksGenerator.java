@@ -6,6 +6,8 @@ import tasksGenerator.exceptions.TaskSolutionException;
 import tasksGenerator.mathClasses.MathFunctions;
 import tasksGenerator.taskTypes.LinearEquation.*;
 import tasksGenerator.taskTypes.RationalArithmetic.*;
+import tasksGenerator.taskTypes.UserTask.*;
+
 
 /**
  * Класс генерирующий математические задачи, типов указанных в {@link MathTaskTypes}, как объекты класса {@link MathTask}.
@@ -15,11 +17,8 @@ final public class TasksGenerator {
 
     private static TasksGenerator tasksGenerator;
 
-    private static final LinearEquationGenerator linearEquationGenerator = new LinearEquationManualGenerator();
-    private static final LinearEquationSolver linearEquationSolver = new LinearEquationWolframSolver();
-
-    private static final RationalArithmeticGenerator rationalArithmeticGenerator = new RationalArithmeticManualGenerator();
-    private static final RationalArithmeticSolver rationalArithmeticSolver = new RationalArithmeticWolframSolver();
+    private final UserTaskGenerator userTaskGenerator = new UserTaskGenerator();
+    private final UserTaskSolver userTaskSolver = new UserTaskMathAPISolver();
 
 
     private TasksGenerator() {}
@@ -41,29 +40,23 @@ final public class TasksGenerator {
      * @throws TaskCreationException если при генерации задачи возникла ошибка.
      */
     public MathTask createTaskByType(MathTaskTypes type) throws TaskCreationException {
-        TaskCondition taskCondition = null;
-        TaskSolution taskSolution = null;
-        switch (type) {
-            case LINEAR_EQUATION -> {
-                try {
-                    LinearEquationTaskCondition condition = linearEquationGenerator.createTaskCondition();
-                    taskSolution = linearEquationSolver.createTaskSolution(condition);
-                    taskCondition = condition;
-                } catch (TaskSolutionException e) {
-                    throw new TaskCreationException(e);
-                }
-            }
-            case RATIONAL_ARITHMETIC -> {
-                try {
-                    RationalArithmeticTaskCondition condition = rationalArithmeticGenerator.createTaskCondition();
-                    taskSolution = rationalArithmeticSolver.createTaskSolution(condition);
-                    taskCondition = condition;
-                } catch (TaskConditionException | TaskSolutionException e) {
-                    throw new TaskCreationException(e);
-                }
-            }
+        try {
+            TaskCondition taskCondition = type.generator.createTaskCondition();
+            TaskSolution taskSolution = type.solver.createTaskSolutionForAbstractCondition(taskCondition);
+            return new MathTask(taskCondition, taskSolution);
+        } catch (TaskConditionException | TaskSolutionException e) {
+            throw new TaskCreationException(e);
         }
-        return new MathTask(taskCondition, taskSolution);
+    }
+
+    public MathTask createTask(String input) throws TaskCreationException {
+        try {
+            TaskCondition taskCondition = userTaskGenerator.createTaskCondition(input);
+            TaskSolution taskSolution = userTaskSolver.createTaskSolutionForAbstractCondition(taskCondition);
+            return new MathTask(taskCondition, taskSolution);
+        } catch (TaskConditionException | TaskSolutionException e) {
+            throw new TaskCreationException(e);
+        }
     }
 
 
@@ -74,15 +67,23 @@ final public class TasksGenerator {
      */
     public MathTask createTask() throws TaskCreationException {
         MathTaskTypes[] allTypes = MathTaskTypes.values();
-        int rand = MathFunctions.intRandomUnsigned(allTypes.length - 1);
+        int rand = MathFunctions.intRandomUnsigned(allTypes.length);
         return createTaskByType(allTypes[rand]);
     }
 
     /**
      * Перечисление типов математических задач, которые способен сгенировать объект класса {@link TasksGenerator}.
      */
-    public static enum MathTaskTypes {
-        LINEAR_EQUATION,
-        RATIONAL_ARITHMETIC
+    public enum MathTaskTypes {
+        LINEAR_EQUATION(new LinearEquationManualGenerator(), new LinearEquationWolframSolver()),
+        RATIONAL_ARITHMETIC(new RationalArithmeticManualGenerator(), new RationalArithmeticWolframSolver());
+        private final ProblemGenerator<? extends TaskCondition> generator;
+        private final ProblemSolverImpl<? extends TaskSolution, ? extends TaskCondition> solver;
+
+        MathTaskTypes(ProblemGenerator<? extends TaskCondition> generator,
+                      ProblemSolverImpl<? extends TaskSolution, ? extends TaskCondition> solver) {
+            this.generator = generator;
+            this.solver = solver;
+        }
     }
 }

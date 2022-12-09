@@ -13,4 +13,6 @@ public interface ProblemGenerator<T extends TaskCondition> {
      * @throws TaskConditionException если при генерации условия возникла ошибка.
      */
     T createTaskCondition() throws TaskConditionException;
+
+
 }

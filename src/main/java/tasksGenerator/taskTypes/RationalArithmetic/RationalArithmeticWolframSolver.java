@@ -23,14 +23,26 @@ public class RationalArithmeticWolframSolver extends RationalArithmeticSolver {
             throw new TaskSolutionException(e);
         }
 
-        if(result.containsKey("Exact result")) {
-            ArrayList<String> results = result.get("Exact result");
+        String keyOfResult = "";
+        if (result.containsKey("Exact result")) {
+            keyOfResult = "Exact result";
+        } else if (result.containsKey("Results")) {
+            keyOfResult = "Results";
+        }
+
+        if(!keyOfResult.equals("")) {
+            ArrayList<String> results = result.get(keyOfResult);
             String value = results.get(0);
-            String solutionSteps = results.get(1);
-            return new RationalArithmeticTaskSolution(solutionSteps, value);
+            if (results.size() > 1)
+                return new RationalArithmeticTaskSolution(results.get(1), value);
+            else
+                return new RationalArithmeticTaskSolution(result.get("Input").get(0), value);
         } else if(result.containsKey("Result"))
             return new RationalArithmeticTaskSolution(result.get("Input").get(0), result.get("Result").get(0));
-        else
+        else {
+            System.out.println("RationalArithmeticWolframSolver");
             throw new TaskSolutionException();
+        }
+
     }
 }
