@@ -4,7 +4,9 @@ import handler.HandlerState;
 import handler.QueryHandler;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -12,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,6 +55,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             SendMessage message = new SendMessage();
+
             message.enableMarkdown(true);
             message.setChatId(update.getMessage().getChatId().toString());
             message.setText(handler.getResponse(update.getMessage().getText(),
@@ -59,6 +63,12 @@ public class TelegramBot extends TelegramLongPollingBot {
             message.setReplyMarkup(keyboardInit(handler.getState(Integer.parseInt(String.valueOf(update.getMessage().getChatId())))));
             try {
                 execute(message);
+                if (handler.getState(Integer.parseInt(String.valueOf(update.getMessage().getChatId()))) == HandlerState.GIVE_ANSWER_FILE) {
+                    SendDocument document = new SendDocument();
+                    document.setChatId(update.getMessage().getChatId().toString());
+                    document.setDocument(new InputFile().setMedia(new File("answers.pdf")));
+                    execute(document);
+                }
             } catch (TelegramApiException e) {
                 e.printStackTrace();
             }
@@ -77,7 +87,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         ArrayList<KeyboardRow> keyboardRows = new ArrayList<>();
 
-        if (state == HandlerState.COMMAND_WAITING) {
+        if (state == HandlerState.COMMAND_WAITING || state == HandlerState.GIVE_ANSWER_FILE) {
             KeyboardRow keyboardRow = new KeyboardRow();
             keyboardRows.add(keyboardRow);
             keyboardRow.add(new KeyboardButton("/help"));

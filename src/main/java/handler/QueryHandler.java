@@ -1,5 +1,6 @@
 package handler;
 
+import PDF.PDFAnswersFile;
 import com.google.gson.JsonSyntaxException;
 import handler.commands.*;
 import storage.JsonStorage;
@@ -19,6 +20,8 @@ import java.util.Map;
 public class QueryHandler {
     private static final TasksGenerator generator = TasksGenerator.instance();
     private JsonStorage storage;
+
+    private PDFAnswersFile answersFile = new PDFAnswersFile();
     /**
      * Таблица содержащая состояние обработчика для каждого пользователя.
      */
@@ -64,6 +67,10 @@ public class QueryHandler {
         return state.get(userId);
     }
 
+    public PDFAnswersFile getAnswersFile() {
+        return answersFile;
+    }
+
     /**
      * Метод, обрабатывающий пользовательский запрос.
      * @param userQuery строка пользовательского запроса
@@ -75,6 +82,9 @@ public class QueryHandler {
         CommandType commandType = null;
         if (!state.containsKey(userId)) {
             state.put(userId, HandlerState.COMMAND_WAITING);
+        }
+        if (state.get(userId) == HandlerState.GIVE_ANSWER_FILE) {
+            state.put(userId, state.get(userId).nextState(null));
         }
         if (state.get(userId) == HandlerState.COMMAND_WAITING) {
             try {
@@ -98,7 +108,7 @@ public class QueryHandler {
                 command = new GenerateTasksCommand(generator, storage, state.get(userId), tasks, tasksSolution);
                 break;
             case ANSWERS:
-                command = new AnswersCommand(storage, state.get(userId), tasks, tasksSolution);
+                command = new AnswersCommand(storage, state.get(userId), answersFile, tasks, tasksSolution);
                 break;
             case STAT:
                 command = new StatCommand(storage);

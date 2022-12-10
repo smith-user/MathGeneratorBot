@@ -5,22 +5,34 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
-public class PDFGenerator {
+public class PDFAnswersFile {
+    private String filePath;
 
-    public static void getAnswersFile(String[] answers) throws IOException, DocumentException{
+
+
+    public void generate(ArrayList<String> answers) throws IOException, DocumentException{
         Document document = new Document();
 
-        PdfWriter.getInstance(document, new FileOutputStream("resources/answersFile.pdf"));
+        PdfWriter.getInstance(document, new FileOutputStream(filePath));
 
         document.open();
         Font font = FontFactory.getFont(FontFactory.COURIER, 14, BaseColor.BLACK);
-        Chunk chunk;
+        Paragraph paragraph;
         for (String answer : answers) {
-            chunk = new Chunk(answer, font);
-            document.add(chunk);
+            paragraph = new Paragraph(answer, font);
+            document.add(paragraph);
         }
         document.close();
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public String getPath() {
+        return filePath;
     }
 
     public static void main(String[] args) throws IOException, DocumentException {
@@ -29,9 +41,9 @@ public class PDFGenerator {
 
         document.open();
         Font font = FontFactory.getFont(FontFactory.COURIER, 14, BaseColor.RED);
-        Chunk chunk = new Chunk("Hello World", font);
+        Paragraph paragraph = new Paragraph("Hello\n World", font);
 
-        document.add(chunk);
+        document.add(paragraph);
         document.close();
     }
 }
