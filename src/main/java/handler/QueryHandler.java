@@ -87,6 +87,7 @@ public class QueryHandler {
             state.put(userId, state.get(userId).nextState(null));
         }
         if (state.get(userId) == HandlerState.COMMAND_WAITING) {
+            System.out.println(1);
             try {
                 commandType = CommandType.valueOf(userQuery.substring(1).toUpperCase());
             } catch (IllegalArgumentException | StringIndexOutOfBoundsException e) {
@@ -96,6 +97,8 @@ public class QueryHandler {
             commandType = CommandType.ANSWERS;
         } else if (state.get(userId) == HandlerState.TASK_TYPE_WAITING)
             commandType = CommandType.TASKS;
+        else if (state.get(userId) == HandlerState.USERS_TASK_WAITING)
+            commandType = CommandType.SOLVE;
 
         switch (commandType) {
             case HELP:
@@ -112,6 +115,9 @@ public class QueryHandler {
                 break;
             case STAT:
                 command = new StatCommand(storage);
+                break;
+            case SOLVE:
+                command = new SolveUserTaskCommand(storage, generator, state.get(userId));
                 break;
             default:
                 return null;
