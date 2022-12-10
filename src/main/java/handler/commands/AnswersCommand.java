@@ -48,8 +48,7 @@ public class AnswersCommand extends TasksCommand {
 
             for (int i = 0; i < getSolutionNumber(userId); i++) {
                 tmpResponse.append("*%d)* `%s`\n".formatted(i + 1, tasks.get(userId).get(i).getExpression()))
-                        .append("*ответ: *`%s`\n".formatted(tasksSolution.get(userId).get(i).getResult()))
-                        .append("`%s`\n".formatted(tasksSolution.get(userId).get(i).getSolutionSteps()));
+                        .append("*ответ: *`%s`\n".formatted(tasksSolution.get(userId).get(i).getResult()));
             }
             generateAnswersFile(userId);
             return tmpResponse.toString();

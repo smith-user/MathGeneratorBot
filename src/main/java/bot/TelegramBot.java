@@ -60,13 +60,13 @@ public class TelegramBot extends TelegramLongPollingBot {
             message.setChatId(update.getMessage().getChatId().toString());
             message.setText(handler.getResponse(update.getMessage().getText(),
                             Math.toIntExact(update.getMessage().getChatId())));
-            message.setReplyMarkup(keyboardInit(handler.getState(Integer.parseInt(String.valueOf(update.getMessage().getChatId())))));
+            message.setReplyMarkup(keyboardInit(handler.getState(Math.toIntExact(update.getMessage().getChatId()))));
             try {
                 execute(message);
-                if (handler.getState(Integer.parseInt(String.valueOf(update.getMessage().getChatId()))) == HandlerState.GIVE_ANSWER_FILE) {
+                if (handler.getState(Math.toIntExact(update.getMessage().getChatId())) == HandlerState.GIVE_ANSWER_FILE) {
                     SendDocument document = new SendDocument();
                     document.setChatId(update.getMessage().getChatId().toString());
-                    document.setDocument(new InputFile().setMedia(new File("answers.pdf")));
+                    document.setDocument(new InputFile().setMedia(new File(handler.getAnswersFile().getPath())));
                     execute(document);
                 }
             } catch (TelegramApiException e) {
