@@ -1,5 +1,7 @@
 package handler.commands;
 
+import PDF.PDFAnswersFile;
+import com.itextpdf.text.DocumentException;
 import handler.CommandType;
 import handler.DefaultResponse;
 import handler.HandlerState;
@@ -15,10 +17,14 @@ import java.util.LinkedHashMap;
  * Команда, проверяущая ответы пользователя на задачи и выводящая ответы к этим задачам.
  */
 public class AnswersCommand extends TasksCommand {
-    public AnswersCommand(JsonStorage storage, HandlerState state,
+
+    private PDFAnswersFile answersFile;
+    private final String ANSWERS_FILE_PATH = "answers.pdf";
+    public AnswersCommand(JsonStorage storage, HandlerState state, PDFAnswersFile answersFile,
                           LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
                           LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution) {
         super(storage,state, tasks, tasksSolution);
+        this.answersFile = answersFile;
     }
 
     @Override
@@ -38,28 +44,42 @@ public class AnswersCommand extends TasksCommand {
 
             try {
                 storage.updateUsersSolvedTasks(userId, rightAnswers(userId, arguments));
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
 
             for (int i = 0; i < getSolutionNumber(userId); i++) {
                 tmpResponse.append("*%d)* `%s`\n".formatted(i + 1, tasks.get(userId).get(i).getExpression()))
                         .append("*ответ: *`%s`\n".formatted(tasksSolution.get(userId).get(i).getResult()))
                         .append("`%s`\n".formatted(tasksSolution.get(userId).get(i).getSolutionSteps()));
             }
+            generateAnswersFile(userId);
             return tmpResponse.toString();
         }
         return null;
     }
 
+    private void generateAnswersFile(int userId) {
+        answersFile.setFilePath(ANSWERS_FILE_PATH);
+        ArrayList<String> answers = new ArrayList<>();
+        for (int i = 0; i < getSolutionNumber(userId); i++) {
+            answers.add("%d) %s \n %s".formatted(i+1,
+                        tasks.get(userId).get(i).getExpression(),
+                        tasksSolution.get(userId).get(i).getSolutionSteps()));
+        }
+        try {
+            answersFile.generate(answers);
+        } catch (IOException | DocumentException ignored) {}
+
+    }
+
     /**
      * @param userId id пользователя
-     * @param answers ответы пользователя на сгенерированные задачи
+     * @param userAnswers ответы пользователя на сгенерированные задачи
      * @return количество правильных ответов пользователя
      */
-    private int rightAnswers(int userId, String answers) {
-        if (answers == null)
+    private int rightAnswers(int userId, String userAnswers) {
+        if (userAnswers == null)
             return 0;
-        String[] answersArray = answers.split(" ");
+        String[] answersArray = userAnswers.split(" ");
         int answersNumber = 0;
         for (int i = 0; i < answersArray.length; i++) {
             if (answersArray[i].equals(tasksSolution.get(userId).get(i).getResult()))

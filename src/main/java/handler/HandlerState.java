@@ -32,10 +32,14 @@ public enum HandlerState {
     ANSWER_WAITING {
         @Override
         public HandlerState nextState(CommandType command) {
-            return COMMAND_WAITING;
+            return GIVE_ANSWER_FILE;
         }
     },
 
+    GIVE_ANSWER_FILE {
+        @Override
+        public HandlerState nextState(CommandType commandType) {return COMMAND_WAITING;}
+    },
     /**
      * Обработчик ожидает тип {@code TaskGenerator.MathTaskTypes}
      * и количество задач для команды {@code CommandType.TASKS}
