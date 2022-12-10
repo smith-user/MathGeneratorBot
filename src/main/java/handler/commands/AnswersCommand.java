@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 public class AnswersCommand extends TasksCommand {
 
     private PDFAnswersFile answersFile;
-    private final String ANSWERS_FILE_PATH = "answers.pdf";
+    private final String ANSWERS_FILE_PATH = "src/main/resources/answers.pdf";
     private static final Logger logger = LogManager.getLogger(AnswersCommand.class.getName());
     public AnswersCommand(JsonStorage storage, HandlerState state, PDFAnswersFile answersFile,
                           LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,

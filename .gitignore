@@ -4,6 +4,7 @@
 
 /.idea
 target
+src/main/resources/answers.pdf
 
 #Ignore private info
 src/main/resources/application.properties
