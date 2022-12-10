@@ -3,6 +3,9 @@ package handler.commands;
 import handler.CommandType;
 import handler.DefaultResponse;
 import handler.HandlerState;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import storage.JsonStorage;
 import tasksGenerator.MathTask;
 import tasksGenerator.TaskCondition;
@@ -24,6 +27,8 @@ public class GenerateTasksCommand extends TasksCommand {
             "арифметика", TasksGenerator.MathTaskTypes.RATIONAL_ARITHMETIC,
             "уравнения", TasksGenerator.MathTaskTypes.LINEAR_EQUATION
     );
+
+    private static final Logger logger = LogManager.getLogger(GenerateTasksCommand.class.getName());
     public GenerateTasksCommand(TasksGenerator generator, JsonStorage storage, HandlerState state,
                                 LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
                                 LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution) {
@@ -33,11 +38,12 @@ public class GenerateTasksCommand extends TasksCommand {
 
     @Override
     public String execute(int userId, String userQuery){
+        logger.traceEntry("userQuery={}, userId={}", userQuery, userId);
         int numberOfTasks;
         TasksGenerator.MathTaskTypes type = null;
         if (state == HandlerState.COMMAND_WAITING) {
             state = state.nextState(CommandType.TASKS);
-            return DefaultResponse.GET_TASK_TYPE;
+            return logger.traceExit(DefaultResponse.GET_TASK_TYPE);
         }
 
         if (state == HandlerState.TASK_TYPE_WAITING) {
@@ -45,12 +51,12 @@ public class GenerateTasksCommand extends TasksCommand {
 
             type = taskType.get(userQueryArray[0]);
             if (type == null)
-                return DefaultResponse.ILLEGAL_TYPE_OF_TASKS;
+                return logger.traceExit(DefaultResponse.ILLEGAL_TYPE_OF_TASKS);
 
             try {
                 numberOfTasks = userQueryArray.length > 1 ? Integer.parseInt(userQueryArray[1]) : DEFAULT_NUMBER_OF_TASK;
             } catch (NumberFormatException e) {
-                return DefaultResponse.ILLEGAL_NUMBER_OF_TASKS;
+                return logger.traceExit(DefaultResponse.ILLEGAL_NUMBER_OF_TASKS);
             }
 
             clearUserPreviousTasks(userId);
@@ -58,16 +64,21 @@ public class GenerateTasksCommand extends TasksCommand {
             try {
                 generateTasks(userId, type, numberOfTasks);
             } catch (TaskCreationException e) {
+                logger.catching(Level.ERROR, e);
                 return DefaultResponse.TASK_GENERATE_FAIL;
             } catch (InvalidParameterException e) {
+                logger.catching(e);
                 return e.getMessage();
             }
 
             try {
                 storage.updateUsersGeneratedTasks(userId, numberOfTasks);
-            } catch (IOException ignored) {}
+            } catch (IOException e) {
+                logger.catching(Level.ERROR, e);
+            }
 
             state = state.nextState(CommandType.TASKS);
+            logger.traceExit("Задачи сненерированы");
             return getAnswerString(userId);
         }
         return null;
@@ -80,6 +91,7 @@ public class GenerateTasksCommand extends TasksCommand {
      * @throws TaskCreationException Если при генерации возникла ошибка
      */
     private void generateTasks(int userId, TasksGenerator.MathTaskTypes type, int number) throws TaskCreationException {
+        logger.traceEntry("userId={}, taskType={}, number={}", userId, type, number);
         MathTask taskType;
         for (int i = 0; i < number; i++) {
             taskType = generator.createTaskByType(type);

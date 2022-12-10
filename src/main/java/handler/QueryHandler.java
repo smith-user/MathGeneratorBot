@@ -3,6 +3,9 @@ package handler;
 import PDF.PDFAnswersFile;
 import com.google.gson.JsonSyntaxException;
 import handler.commands.*;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import storage.JsonStorage;
 import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
@@ -49,12 +52,18 @@ public class QueryHandler {
             return size() > 5;
         }
     };
+
+    private static final Logger logger = LogManager.getLogger(QueryHandler.class.getName());
+
     public QueryHandler() {
+        logger.traceEntry();
         try {
             storage = new JsonStorage();
         } catch (IOException | InvalidPathException | JsonSyntaxException e) {
+            logger.catching(Level.FATAL, e);
             System.exit(1);
         }
+        logger.traceExit();
     }
 
     /**
@@ -78,6 +87,7 @@ public class QueryHandler {
      * @return строка - ответ пользователю
      */
     public String getResponse(String userQuery, Integer userId) {
+        logger.traceEntry("userQuery={}, userId={}", userQuery, userId);
         Command command;
         CommandType commandType = null;
         if (!state.containsKey(userId)) {
@@ -87,11 +97,11 @@ public class QueryHandler {
             state.put(userId, state.get(userId).nextState(null));
         }
         if (state.get(userId) == HandlerState.COMMAND_WAITING) {
-            System.out.println(1);
             try {
                 commandType = CommandType.valueOf(userQuery.substring(1).toUpperCase());
             } catch (IllegalArgumentException | StringIndexOutOfBoundsException e) {
-                return DefaultResponse.UNKNOWN_COMMAND;
+                logger.catching(e);
+                return logger.traceExit(DefaultResponse.UNKNOWN_COMMAND);
             }
         } else if (state.get(userId) == HandlerState.ANSWER_WAITING) {
             commandType = CommandType.ANSWERS;
@@ -123,7 +133,9 @@ public class QueryHandler {
                 return null;
         }
         String response = command.execute(userId, userQuery);
+        logger.debug("handlerState={}, userId={}", state.get(userId), userId);
         state.put(userId, command.getState());
+        logger.traceExit();
         return response;
     }
 }

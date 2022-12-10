@@ -5,6 +5,8 @@ import com.itextpdf.text.DocumentException;
 import handler.CommandType;
 import handler.DefaultResponse;
 import handler.HandlerState;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import storage.JsonStorage;
 import tasksGenerator.TaskCondition;
 import tasksGenerator.TaskSolution;
@@ -20,6 +22,7 @@ public class AnswersCommand extends TasksCommand {
 
     private PDFAnswersFile answersFile;
     private final String ANSWERS_FILE_PATH = "answers.pdf";
+    private static final Logger logger = LogManager.getLogger(AnswersCommand.class.getName());
     public AnswersCommand(JsonStorage storage, HandlerState state, PDFAnswersFile answersFile,
                           LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
                           LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution) {
@@ -29,12 +32,13 @@ public class AnswersCommand extends TasksCommand {
 
     @Override
     public String execute(int userId, String arguments) {
+        logger.traceEntry("arguments={}, userId={}", arguments, userId);
         if (tasksSolution.get(userId) == null || tasksSolution.get(userId).isEmpty())
-            return DefaultResponse.NO_TASKS_GENERATED;
+            return logger.traceExit(DefaultResponse.NO_TASKS_GENERATED);
 
         if (state == HandlerState.COMMAND_WAITING) {
             state = state.nextState(CommandType.ANSWERS);
-            return DefaultResponse.GET_ANSWERS;
+            return logger.traceExit(DefaultResponse.GET_ANSWERS);
         }
         if (state == HandlerState.ANSWER_WAITING) {
             state = state.nextState(CommandType.ANSWERS);
@@ -44,7 +48,9 @@ public class AnswersCommand extends TasksCommand {
 
             try {
                 storage.updateUsersSolvedTasks(userId, rightAnswers(userId, arguments));
-            } catch (IOException ignored) {}
+            } catch (IOException e) {
+                logger.catching(e);
+            }
 
             for (int i = 0; i < getSolutionNumber(userId); i++) {
                 tmpResponse.append("*%d)* `%s`\n".formatted(i + 1, tasks.get(userId).get(i).getExpression()))
@@ -57,6 +63,7 @@ public class AnswersCommand extends TasksCommand {
     }
 
     private void generateAnswersFile(int userId) {
+        logger.traceEntry("userId={}", userId);
         answersFile.setFilePath(ANSWERS_FILE_PATH);
         ArrayList<String> answers = new ArrayList<>();
         for (int i = 0; i < getSolutionNumber(userId); i++) {
@@ -66,8 +73,10 @@ public class AnswersCommand extends TasksCommand {
         }
         try {
             answersFile.generate(answers);
-        } catch (IOException | DocumentException ignored) {}
-
+        } catch (IOException | DocumentException e) {
+            logger.catching(e);
+        }
+        logger.traceExit("Файл сгенерирован");
     }
 
     /**

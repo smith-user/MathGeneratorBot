@@ -17,7 +17,8 @@ abstract public class Command{
 
     /**
      * Метод, выполняющий соответсвующую команду бота
-     * @param userId id пользователя
+     *
+     * @param userId    id пользователя
      * @param arguments аргументы команды
      * @return строка - результат выполнения команды
      */
