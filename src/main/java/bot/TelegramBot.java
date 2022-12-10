@@ -96,6 +96,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             keyboardRows.add(keyboardRow);
             keyboardRow.add(new KeyboardButton("/answers"));
             keyboardRow.add(new KeyboardButton("/stat"));
+            keyboardRow.add(new KeyboardButton("/solve"));
         } else if (state == HandlerState.TASK_TYPE_WAITING) {
             KeyboardRow keyboardRow = new KeyboardRow();
             keyboardRows.add(keyboardRow);
@@ -109,8 +110,11 @@ public class TelegramBot extends TelegramLongPollingBot {
             KeyboardRow keyboardRow = new KeyboardRow();
             keyboardRows.add(keyboardRow);
             keyboardRow.add(new KeyboardButton("введите ответы"));
+        } else if (state == HandlerState.USERS_TASK_WAITING) {
+            KeyboardRow keyboardRow = new KeyboardRow();
+            keyboardRows.add(keyboardRow);
+            keyboardRow.add(new KeyboardButton("введите задачу"));
         }
-
         keyboard.setKeyboard(keyboardRows);
         return keyboard;
     }

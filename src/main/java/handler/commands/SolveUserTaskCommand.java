@@ -23,9 +23,7 @@ public class SolveUserTaskCommand extends Command{
     public String execute(int userId, String arguments) {
 
         if (state == HandlerState.COMMAND_WAITING) {
-            System.out.println(state);
             state = state.nextState(CommandType.SOLVE);
-            System.out.println(state);
             return DefaultResponse.GET_USER_TASK;
         }
 
