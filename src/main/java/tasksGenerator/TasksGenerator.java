@@ -1,5 +1,6 @@
 package tasksGenerator;
 
+import org.apache.logging.log4j.Level;
 import tasksGenerator.exceptions.TaskConditionException;
 import tasksGenerator.exceptions.TaskCreationException;
 import tasksGenerator.exceptions.TaskSolutionException;
@@ -7,6 +8,9 @@ import tasksGenerator.mathClasses.MathFunctions;
 import tasksGenerator.taskTypes.LinearEquation.*;
 import tasksGenerator.taskTypes.RationalArithmetic.*;
 import tasksGenerator.taskTypes.UserTask.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -19,18 +23,24 @@ final public class TasksGenerator {
 
     private final UserTaskGenerator userTaskGenerator = new UserTaskGenerator();
     private final UserTaskSolver userTaskSolver = new UserTaskMathAPISolver();
+    private static final Logger logger = LogManager.getLogger(TasksGenerator.class.getName());
 
 
-    private TasksGenerator() {}
+    private TasksGenerator() {
+        logger.traceEntry();
+        logger.traceExit();
+    }
 
     /**
      *
      * @return объект данного класса.
      */
     public static TasksGenerator instance() {
-        if (tasksGenerator == null)
+        logger.traceEntry("Получение экземпляра");
+        if (tasksGenerator == null) {
             tasksGenerator = new TasksGenerator();
-        return tasksGenerator;
+        }
+        return logger.traceExit(tasksGenerator);
     }
 
     /**
@@ -40,22 +50,26 @@ final public class TasksGenerator {
      * @throws TaskCreationException если при генерации задачи возникла ошибка.
      */
     public MathTask createTaskByType(MathTaskTypes type) throws TaskCreationException {
+        logger.traceEntry("type={}", type);
         try {
             TaskCondition taskCondition = type.generator.createTaskCondition();
             TaskSolution taskSolution = type.solver.createTaskSolutionForAbstractCondition(taskCondition);
-            return new MathTask(taskCondition, taskSolution);
+            return logger.traceExit(new MathTask(taskCondition, taskSolution));
         } catch (TaskConditionException | TaskSolutionException e) {
-            throw new TaskCreationException(e);
+            logger.catching(e);
+            throw logger.throwing(new TaskCreationException(e));
         }
     }
 
     public MathTask createTask(String input) throws TaskCreationException {
+        logger.traceEntry("input=\"{}\"", input);
         try {
             TaskCondition taskCondition = userTaskGenerator.createTaskCondition(input);
             TaskSolution taskSolution = userTaskSolver.createTaskSolutionForAbstractCondition(taskCondition);
-            return new MathTask(taskCondition, taskSolution);
+            return logger.traceExit(new MathTask(taskCondition, taskSolution));
         } catch (TaskConditionException | TaskSolutionException e) {
-            throw new TaskCreationException(e);
+            logger.catching(e);
+            throw logger.throwing(new TaskCreationException(e));
         }
     }
 
@@ -66,9 +80,10 @@ final public class TasksGenerator {
      * @throws TaskCreationException если при генерации задачи возникла ошибка.
      */
     public MathTask createTask() throws TaskCreationException {
+        logger.traceEntry();
         MathTaskTypes[] allTypes = MathTaskTypes.values();
         int rand = MathFunctions.intRandomUnsigned(allTypes.length);
-        return createTaskByType(allTypes[rand]);
+        return logger.traceExit(createTaskByType(allTypes[rand]));
     }
 
     /**

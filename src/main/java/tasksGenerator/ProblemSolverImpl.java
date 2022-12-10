@@ -8,6 +8,8 @@ abstract public class ProblemSolverImpl<T extends TaskSolution,U extends TaskCon
     final public T createTaskSolutionForAbstractCondition(TaskCondition condition) throws TaskSolutionException {
         try {
             return createTaskSolution( (U) condition);
+        } catch (TaskSolutionException e) {
+            throw e;
         } catch (Exception e) {
             throw new TaskSolutionException();
         }

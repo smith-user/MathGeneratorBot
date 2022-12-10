@@ -1,5 +1,8 @@
 package tasksGenerator.taskTypes.RationalArithmetic;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import tasksGenerator.TasksGenerator;
 import tasksGenerator.exceptions.TaskConditionException;
 import tasksGenerator.exceptions.TaskSolutionException;
 
@@ -9,6 +12,7 @@ import java.util.Objects;
 
 final public class RationalArithmeticManualGenerator extends RationalArithmeticGenerator {
 
+    private static final Logger logger = LogManager.getLogger(TasksGenerator.class.getName());
     private static final int maxNumber = 7;
     private static final int maxDegree = 2;
     private static final int minUnitCount = 3;
@@ -19,9 +23,11 @@ final public class RationalArithmeticManualGenerator extends RationalArithmeticG
 
     @Override
     public RationalArithmeticTaskCondition createTaskCondition() {
+        logger.traceEntry();
         String expression = generateUnit(1, false);
+        logger.debug("Сгенерируемое выражение: \"{}\"", expression);
         expression = expression.substring(1, expression.length() - 1);
-        return new RationalArithmeticTaskCondition(expression);
+        return logger.traceExit(new RationalArithmeticTaskCondition(expression));
     }
 
     /**
