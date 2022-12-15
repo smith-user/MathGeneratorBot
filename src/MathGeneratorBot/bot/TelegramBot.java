@@ -1,12 +1,10 @@
 package MathGeneratorBot.bot;
 
 import MathGeneratorBot.appContext.AppContext;
-import MathGeneratorBot.handler.QueryHandler;
 import MathGeneratorBot.appContext.AppProperties;
 import MathGeneratorBot.handler.HandlerState;
-
+import MathGeneratorBot.handler.QueryHandler;
 import org.springframework.context.ApplicationContext;
-
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
@@ -24,11 +22,13 @@ import java.util.ArrayList;
 
 public class TelegramBot extends TelegramLongPollingBot {
     private QueryHandler handler = new QueryHandler();
+    private TelegramKeyboard keyboard;
     private final AppProperties properties;
 
     public TelegramBot() {
         ApplicationContext ctx = AppContext.getApplicationContext();
         properties = ctx.getBean(AppProperties.class);
+        keyboard = new TelegramKeyboard();
     }
 
     public void run() {
@@ -59,7 +59,9 @@ public class TelegramBot extends TelegramLongPollingBot {
             message.setChatId(update.getMessage().getChatId().toString());
             message.setText(handler.getResponse(update.getMessage().getText(),
                             Math.toIntExact(update.getMessage().getChatId())));
-            message.setReplyMarkup(keyboardInit(handler.getState(Math.toIntExact(update.getMessage().getChatId()))));
+            message.setReplyMarkup(
+                    keyboard.setButtons(handler.getState(Math.toIntExact(update.getMessage().getChatId())))
+            );
             try {
                 execute(message);
                 if (handler.getState(Math.toIntExact(update.getMessage().getChatId())) == HandlerState.GIVE_ANSWER_FILE) {

@@ -98,7 +98,7 @@ public class QueryHandler {
         }
         if (state.get(userId) == HandlerState.COMMAND_WAITING) {
             try {
-                commandType = CommandType.valueOf(userQuery.substring(1).toUpperCase());
+                commandType = CommandType.valueByQuery(userQuery);
             } catch (IllegalArgumentException | StringIndexOutOfBoundsException e) {
                 logger.catching(e);
                 return logger.traceExit(DefaultResponse.UNKNOWN_COMMAND);

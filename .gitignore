@@ -4,7 +4,7 @@
 
 /.idea
 target
-src/main/resources/answers.pdf
+src/MathGeneratorBot/resources/answers.pdf
 
 #Ignore private info
 src/MathGeneratorBot/resources/application.properties
