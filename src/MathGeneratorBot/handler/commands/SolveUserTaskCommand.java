@@ -24,10 +24,9 @@ public class SolveUserTaskCommand extends Command{
 
     @Override
     public String execute(int userId, String arguments) {
-        logger.traceEntry("arguments={}, userId={}", arguments, userId);
         if (state == HandlerState.COMMAND_WAITING) {
             state = state.nextState(CommandType.SOLVE);
-            return logger.traceExit(DefaultResponse.GET_USER_TASK);
+            return DefaultResponse.GET_USER_TASK;
         }
 
         else if (state == HandlerState.USERS_TASK_WAITING) {
@@ -37,13 +36,12 @@ public class SolveUserTaskCommand extends Command{
                 TaskSolution taskSolution = task.getSolution();
                 TaskCondition taskCondition = task.getCondition();
                 String response = "`%s`".formatted(taskSolution.getResult());
-                return logger.traceExit(response);
+                return response;
             } catch (TaskCreationException e) {
                 logger.catching(e);
                 return logger.traceExit(DefaultResponse.TASK_SOLVE_FAIL);
             }
         }
-        logger.traceExit("null");
         return null;
     }
 

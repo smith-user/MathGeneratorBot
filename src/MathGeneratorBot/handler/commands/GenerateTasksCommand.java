@@ -38,12 +38,11 @@ public class GenerateTasksCommand extends TasksCommand {
 
     @Override
     public String execute(int userId, String userQuery){
-        logger.traceEntry("userQuery={}, userId={}", userQuery, userId);
         int numberOfTasks;
         TasksGenerator.MathTaskTypes type = null;
         if (state == HandlerState.COMMAND_WAITING) {
             state = state.nextState(CommandType.TASKS);
-            return logger.traceExit(DefaultResponse.GET_TASK_TYPE);
+            return DefaultResponse.GET_TASK_TYPE;
         }
 
         if (state == HandlerState.TASK_TYPE_WAITING) {
@@ -51,12 +50,12 @@ public class GenerateTasksCommand extends TasksCommand {
 
             type = taskType.get(userQueryArray[0]);
             if (type == null)
-                return logger.traceExit(DefaultResponse.ILLEGAL_TYPE_OF_TASKS);
+                return DefaultResponse.ILLEGAL_TYPE_OF_TASKS;
 
             try {
                 numberOfTasks = userQueryArray.length > 1 ? Integer.parseInt(userQueryArray[1]) : DEFAULT_NUMBER_OF_TASK;
             } catch (NumberFormatException e) {
-                return logger.traceExit(DefaultResponse.ILLEGAL_NUMBER_OF_TASKS);
+                return DefaultResponse.ILLEGAL_NUMBER_OF_TASKS;
             }
 
             clearUserPreviousTasks(userId);
@@ -64,7 +63,7 @@ public class GenerateTasksCommand extends TasksCommand {
             try {
                 generateTasks(userId, type, numberOfTasks);
             } catch (TaskCreationException e) {
-                logger.catching(Level.ERROR, e);
+                logger.catching(Level.WARN, e);
                 return DefaultResponse.TASK_GENERATE_FAIL;
             } catch (InvalidParameterException e) {
                 logger.catching(e);
@@ -78,7 +77,6 @@ public class GenerateTasksCommand extends TasksCommand {
             }
 
             state = state.nextState(CommandType.TASKS);
-            logger.traceExit("Задачи сненерированы");
             return getAnswerString(userId);
         }
         return null;

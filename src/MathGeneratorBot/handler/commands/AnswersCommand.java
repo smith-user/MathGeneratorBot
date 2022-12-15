@@ -32,13 +32,12 @@ public class AnswersCommand extends TasksCommand {
 
     @Override
     public String execute(int userId, String arguments) {
-        logger.traceEntry("arguments={}, userId={}", arguments, userId);
         if (tasksSolution.get(userId) == null || tasksSolution.get(userId).isEmpty())
-            return logger.traceExit(DefaultResponse.NO_TASKS_GENERATED);
+            return DefaultResponse.NO_TASKS_GENERATED;
 
         if (state == HandlerState.COMMAND_WAITING) {
             state = state.nextState(CommandType.ANSWERS);
-            return logger.traceExit(DefaultResponse.GET_ANSWERS);
+            return DefaultResponse.GET_ANSWERS;
         }
         if (state == HandlerState.ANSWER_WAITING) {
             state = state.nextState(CommandType.ANSWERS);
@@ -63,7 +62,6 @@ public class AnswersCommand extends TasksCommand {
     }
 
     private void generateAnswersFile(int userId) {
-        logger.traceEntry("userId={}", userId);
         answersFile.setFilePath(ANSWERS_FILE_PATH);
         ArrayList<String> answers = new ArrayList<>();
         for (int i = 0; i < getSolutionNumber(userId); i++) {
@@ -76,7 +74,6 @@ public class AnswersCommand extends TasksCommand {
         } catch (IOException | DocumentException e) {
             logger.catching(e);
         }
-        logger.traceExit("Файл сгенерирован");
     }
 
     /**

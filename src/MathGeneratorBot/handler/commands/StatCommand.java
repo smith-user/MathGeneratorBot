@@ -15,10 +15,9 @@ public class StatCommand extends Command {
     }
     @Override
     public String execute(int userId, String arguments) {
-        logger.traceEntry("arguments={}, userId={}", arguments, userId);
         User user = storage.getUserById(userId);
-        return logger.traceExit("Всего вы сгенерировали *%d* задач и решили из них *%d* задач".formatted(
+        return "Всего вы сгенерировали *%d* задач и решили из них *%d* задач".formatted(
                 user.getGeneratedTasks(), user.getSolvedTasks()
-        ));
+        );
     }
 }

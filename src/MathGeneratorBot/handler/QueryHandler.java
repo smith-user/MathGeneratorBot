@@ -56,14 +56,11 @@ public class QueryHandler {
     private static final Logger logger = LogManager.getLogger(QueryHandler.class.getName());
 
     public QueryHandler() {
-        logger.traceEntry();
         try {
             storage = new JsonStorage();
         } catch (IOException | InvalidPathException | JsonSyntaxException e) {
-            logger.catching(Level.FATAL, e);
-            System.exit(1);
+            logger.catching(Level.ERROR, e);
         }
-        logger.traceExit();
     }
 
     /**
@@ -87,9 +84,9 @@ public class QueryHandler {
      * @return строка - ответ пользователю
      */
     public String getResponse(String userQuery, Integer userId) {
-        logger.traceEntry("userQuery={}, userId={}", userQuery, userId);
         Command command;
         CommandType commandType = null;
+        logger.info("id={}, query={}", userId, userQuery);
         if (!state.containsKey(userId)) {
             state.put(userId, HandlerState.COMMAND_WAITING);
         }
@@ -97,12 +94,9 @@ public class QueryHandler {
             state.put(userId, state.get(userId).nextState(null));
         }
         if (state.get(userId) == HandlerState.COMMAND_WAITING) {
-            try {
-                commandType = CommandType.valueByQuery(userQuery);
-            } catch (IllegalArgumentException | StringIndexOutOfBoundsException e) {
-                logger.catching(e);
-                return logger.traceExit(DefaultResponse.UNKNOWN_COMMAND);
-            }
+            commandType = CommandType.valueByQuery(userQuery);
+            if (commandType == null)
+                return DefaultResponse.UNKNOWN_COMMAND;
         } else if (state.get(userId) == HandlerState.ANSWER_WAITING) {
             commandType = CommandType.ANSWERS;
         } else if (state.get(userId) == HandlerState.TASK_TYPE_WAITING)
@@ -133,9 +127,7 @@ public class QueryHandler {
                 return null;
         }
         String response = command.execute(userId, userQuery);
-        logger.debug("handlerState={}, userId={}", state.get(userId), userId);
         state.put(userId, command.getState());
-        logger.traceExit();
         return response;
     }
 }
