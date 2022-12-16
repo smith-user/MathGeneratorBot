@@ -66,7 +66,7 @@ public class GenerateTasksCommand extends TasksCommand {
                 logger.catching(Level.WARN, e);
                 return DefaultResponse.TASK_GENERATE_FAIL;
             } catch (InvalidParameterException e) {
-                logger.catching(e);
+                logger.catching(Level.WARN, e);
                 return e.getMessage();
             }
 

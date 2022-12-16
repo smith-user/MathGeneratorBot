@@ -86,7 +86,7 @@ public class QueryHandler {
     public String getResponse(String userQuery, Integer userId) {
         Command command;
         CommandType commandType = null;
-        logger.info("id={}, query={}", userId, userQuery);
+
         if (!state.containsKey(userId)) {
             state.put(userId, HandlerState.COMMAND_WAITING);
         }
@@ -95,15 +95,18 @@ public class QueryHandler {
         }
         if (state.get(userId) == HandlerState.COMMAND_WAITING) {
             commandType = CommandType.valueByQuery(userQuery);
-            if (commandType == null)
+            if (commandType == null) {
+                logger.info("id={}, commnad=UNKNOWN_COMMAND", userId);
                 return DefaultResponse.UNKNOWN_COMMAND;
+            }
+
         } else if (state.get(userId) == HandlerState.ANSWER_WAITING) {
             commandType = CommandType.ANSWERS;
         } else if (state.get(userId) == HandlerState.TASK_TYPE_WAITING)
             commandType = CommandType.TASKS;
         else if (state.get(userId) == HandlerState.USERS_TASK_WAITING)
             commandType = CommandType.SOLVE;
-
+        logger.info("id={}, query={}, command={}", userId, userQuery, commandType);
         switch (commandType) {
             case HELP:
                 command = new HelpCommand();

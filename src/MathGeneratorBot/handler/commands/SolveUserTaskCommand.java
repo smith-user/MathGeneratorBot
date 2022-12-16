@@ -39,7 +39,7 @@ public class SolveUserTaskCommand extends Command{
                 return response;
             } catch (TaskCreationException e) {
                 logger.catching(e);
-                return logger.traceExit(DefaultResponse.TASK_SOLVE_FAIL);
+                return DefaultResponse.TASK_SOLVE_FAIL;
             }
         }
         return null;
