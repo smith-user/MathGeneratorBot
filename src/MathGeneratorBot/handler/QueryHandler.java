@@ -1,18 +1,14 @@
 package MathGeneratorBot.handler;
 
+import MathGeneratorBot.PDF.PDFAnswersFile;
 import MathGeneratorBot.handler.commands.*;
 import MathGeneratorBot.storage.JsonStorage;
 import MathGeneratorBot.tasksGenerator.TaskCondition;
 import MathGeneratorBot.tasksGenerator.TaskSolution;
 import MathGeneratorBot.tasksGenerator.TasksGenerator;
-import MathGeneratorBot.PDF.PDFAnswersFile;
-import com.google.gson.JsonSyntaxException;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -23,7 +19,6 @@ import java.util.Map;
 public class QueryHandler {
     private static final TasksGenerator generator = TasksGenerator.instance();
     private JsonStorage storage;
-
     private PDFAnswersFile answersFile = new PDFAnswersFile();
     /**
      * Таблица содержащая состояние обработчика для каждого пользователя.
@@ -55,12 +50,8 @@ public class QueryHandler {
 
     private static final Logger logger = LogManager.getLogger(QueryHandler.class.getName());
 
-    public QueryHandler() {
-        try {
-            storage = new JsonStorage();
-        } catch (IOException | InvalidPathException | JsonSyntaxException e) {
-            logger.catching(Level.ERROR, e);
-        }
+    public QueryHandler(JsonStorage storage) {
+        this.storage = storage;
     }
 
     /**
@@ -115,7 +106,7 @@ public class QueryHandler {
                 command = new StartCommand(storage);
                 break;
             case TASKS:
-                command = new GenerateTasksCommand(generator, storage, state.get(userId), tasks, tasksSolution);
+                command = new GenerateTasksCommand(storage, state.get(userId), tasks, tasksSolution);
                 break;
             case ANSWERS:
                 command = new AnswersCommand(storage, state.get(userId), answersFile, tasks, tasksSolution);
@@ -124,7 +115,7 @@ public class QueryHandler {
                 command = new StatCommand(storage);
                 break;
             case SOLVE:
-                command = new SolveUserTaskCommand(storage, generator, state.get(userId));
+                command = new SolveUserTaskCommand(storage, state.get(userId));
                 break;
             default:
                 return null;

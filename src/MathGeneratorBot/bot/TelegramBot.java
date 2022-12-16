@@ -4,6 +4,7 @@ import MathGeneratorBot.appContext.AppContext;
 import MathGeneratorBot.appContext.AppProperties;
 import MathGeneratorBot.handler.HandlerState;
 import MathGeneratorBot.handler.QueryHandler;
+import MathGeneratorBot.storage.JsonStorage;
 import org.springframework.context.ApplicationContext;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -11,21 +12,20 @@ import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.io.File;
-import java.util.ArrayList;
 
 public class TelegramBot extends TelegramLongPollingBot {
-    private QueryHandler handler = new QueryHandler();
+    private QueryHandler handler;
+    private JsonStorage storage;
     private TelegramKeyboard keyboard;
     private final AppProperties properties;
 
-    public TelegramBot() {
+    public TelegramBot(JsonStorage storage) {
+        this.storage = storage;
+        this.handler = new QueryHandler(storage);
         ApplicationContext ctx = AppContext.getApplicationContext();
         properties = ctx.getBean(AppProperties.class);
         keyboard = new TelegramKeyboard();
@@ -34,7 +34,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     public void run() {
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(new TelegramBot());
+            botsApi.registerBot(new TelegramBot(this.storage));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
@@ -74,49 +74,5 @@ public class TelegramBot extends TelegramLongPollingBot {
                 e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * формирует клавиатуру в чате с tg ботом
-     * @param state состояние обработчика {@code QueryHandler}
-     * @return объект клавиатуры
-     */
-    private ReplyKeyboardMarkup keyboardInit(HandlerState state) {
-        ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
-        keyboard.setResizeKeyboard(true);
-        keyboard.setOneTimeKeyboard(false);
-
-        ArrayList<KeyboardRow> keyboardRows = new ArrayList<>();
-
-        if (state == HandlerState.COMMAND_WAITING || state == HandlerState.GIVE_ANSWER_FILE) {
-            KeyboardRow keyboardRow = new KeyboardRow();
-            keyboardRows.add(keyboardRow);
-            keyboardRow.add(new KeyboardButton("/help"));
-            keyboardRow.add(new KeyboardButton("/tasks"));
-            keyboardRow = new KeyboardRow();
-            keyboardRows.add(keyboardRow);
-            keyboardRow.add(new KeyboardButton("/answers"));
-            keyboardRow.add(new KeyboardButton("/stat"));
-            keyboardRow.add(new KeyboardButton("/solve"));
-        } else if (state == HandlerState.TASK_TYPE_WAITING) {
-            KeyboardRow keyboardRow = new KeyboardRow();
-            keyboardRows.add(keyboardRow);
-            keyboardRow.add(new KeyboardButton("арифметика 2"));
-            keyboardRow.add(new KeyboardButton("арифметика 4"));
-            keyboardRow = new KeyboardRow();
-            keyboardRows.add(keyboardRow);
-            keyboardRow.add(new KeyboardButton("уравнения 2"));
-            keyboardRow.add(new KeyboardButton("уравнения 4"));
-        } else if (state == HandlerState.ANSWER_WAITING) {
-            KeyboardRow keyboardRow = new KeyboardRow();
-            keyboardRows.add(keyboardRow);
-            keyboardRow.add(new KeyboardButton("введите ответы"));
-        } else if (state == HandlerState.USERS_TASK_WAITING) {
-            KeyboardRow keyboardRow = new KeyboardRow();
-            keyboardRows.add(keyboardRow);
-            keyboardRow.add(new KeyboardButton("введите задачу"));
-        }
-        keyboard.setKeyboard(keyboardRows);
-        return keyboard;
     }
 }

@@ -14,9 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HandlerTest {
     QueryHandler handler;
+    JsonStorage storage;
     @BeforeEach
-    void init() {
-        handler = new QueryHandler();
+    void init() throws IOException{
+        storage = new JsonStorage();
+
+        handler = new QueryHandler(storage);
         handler.getResponse("/start", -1);
     }
 
@@ -28,7 +31,6 @@ public class HandlerTest {
 
     @Test
     void testStatCommand() throws IOException {
-        JsonStorage storage = new JsonStorage();
         User user = storage.getUserById(-1);
         assertEquals(handler.getResponse("/stat", -1),
                 "Всего вы сгенерировали *%d* задач и решили из них *%d* задач".formatted(

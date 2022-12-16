@@ -21,19 +21,17 @@ import java.util.Map;
 
 public class GenerateTasksCommand extends TasksCommand {
     private final int DEFAULT_NUMBER_OF_TASK = 1;
-    private TasksGenerator generator;
-
+    private static TasksGenerator generator = TasksGenerator.instance();
     private final Map<String, TasksGenerator.MathTaskTypes> taskType =  Map.of(
             "арифметика", TasksGenerator.MathTaskTypes.RATIONAL_ARITHMETIC,
             "уравнения", TasksGenerator.MathTaskTypes.LINEAR_EQUATION
     );
 
     private static final Logger logger = LogManager.getLogger(GenerateTasksCommand.class.getName());
-    public GenerateTasksCommand(TasksGenerator generator, JsonStorage storage, HandlerState state,
+    public GenerateTasksCommand(JsonStorage storage, HandlerState state,
                                 LinkedHashMap<Integer, ArrayList<TaskCondition>> tasks,
                                 LinkedHashMap<Integer, ArrayList<TaskSolution>> tasksSolution) {
         super(storage,state, tasks, tasksSolution);
-        this.generator = generator;
     }
 
     @Override
