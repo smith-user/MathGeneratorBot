@@ -4,7 +4,6 @@ import MathGeneratorBot.appContext.AppContext;
 import MathGeneratorBot.appContext.AppProperties;
 import MathGeneratorBot.handler.HandlerState;
 import MathGeneratorBot.handler.QueryHandler;
-import MathGeneratorBot.storage.JsonStorage;
 import org.springframework.context.ApplicationContext;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -19,13 +18,11 @@ import java.io.File;
 
 public class TelegramBot extends TelegramLongPollingBot {
     private QueryHandler handler;
-    private JsonStorage storage;
     private TelegramKeyboard keyboard;
     private final AppProperties properties;
 
-    public TelegramBot(JsonStorage storage) {
-        this.storage = storage;
-        this.handler = new QueryHandler(storage);
+    public TelegramBot(QueryHandler handler) {
+        this.handler = handler;
         ApplicationContext ctx = AppContext.getApplicationContext();
         properties = ctx.getBean(AppProperties.class);
         keyboard = new TelegramKeyboard();
@@ -34,7 +31,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     public void run() {
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(new TelegramBot(this.storage));
+            botsApi.registerBot(new TelegramBot(this.handler));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

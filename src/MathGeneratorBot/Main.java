@@ -2,8 +2,10 @@ package MathGeneratorBot;
 
 
 import MathGeneratorBot.bot.TelegramBot;
+import MathGeneratorBot.handler.QueryHandler;
 import MathGeneratorBot.handler.commands.GenerateTasksCommand;
 import MathGeneratorBot.storage.JsonStorage;
+import MathGeneratorBot.tasksGenerator.TasksGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,7 +21,9 @@ public class Main {
         } catch (IOException | IllegalArgumentException e) {
             logger.catching(e);
         }
-        TelegramBot bot = new TelegramBot(storage);
+        TasksGenerator generator = TasksGenerator.instance();
+        QueryHandler handler = new QueryHandler(storage, generator);
+        TelegramBot bot = new TelegramBot(handler);
         bot.run();
     }
 }

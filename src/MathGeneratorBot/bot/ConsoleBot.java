@@ -1,7 +1,6 @@
 package MathGeneratorBot.bot;
 
 import MathGeneratorBot.handler.QueryHandler;
-import MathGeneratorBot.storage.JsonStorage;
 
 import java.util.Scanner;
 
@@ -14,8 +13,8 @@ public class ConsoleBot {
      * Метод получает данные от пользователя, отправляет их обработчику {@code Handler}
      * и отправляет ответ пользователю {@code response}
      */
-    ConsoleBot(JsonStorage storage) {
-        handler = new QueryHandler(storage);
+    ConsoleBot(QueryHandler handler) {
+        this.handler = handler;
     }
     public void run() {
         String response;

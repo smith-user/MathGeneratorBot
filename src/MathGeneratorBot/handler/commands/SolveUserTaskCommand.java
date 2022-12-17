@@ -13,12 +13,13 @@ import org.apache.logging.log4j.Logger;
 import MathGeneratorBot.tasksGenerator.exceptions.TaskCreationException;
 
 public class SolveUserTaskCommand extends Command{
-    private static TasksGenerator generator = TasksGenerator.instance();
+    private TasksGenerator generator;
     private HandlerState state;
     private static final Logger logger = LogManager.getLogger(SolveUserTaskCommand.class.getName());
-    public SolveUserTaskCommand(JsonStorage storage, HandlerState state) {
+    public SolveUserTaskCommand(JsonStorage storage, TasksGenerator generator, HandlerState state) {
         super(storage);
         this.state = state;
+        this.generator = generator;
     }
 
     @Override

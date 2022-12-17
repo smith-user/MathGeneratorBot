@@ -17,7 +17,7 @@ import java.util.Map;
  * Класс обработчика пользовательского запроса.
  */
 public class QueryHandler {
-    private static final TasksGenerator generator = TasksGenerator.instance();
+    private TasksGenerator generator;
     private JsonStorage storage;
     private PDFAnswersFile answersFile = new PDFAnswersFile();
     /**
@@ -50,8 +50,9 @@ public class QueryHandler {
 
     private static final Logger logger = LogManager.getLogger(QueryHandler.class.getName());
 
-    public QueryHandler(JsonStorage storage) {
+    public QueryHandler(JsonStorage storage, TasksGenerator generator) {
         this.storage = storage;
+        this.generator = generator;
     }
 
     /**
@@ -106,7 +107,7 @@ public class QueryHandler {
                 command = new StartCommand(storage);
                 break;
             case TASKS:
-                command = new GenerateTasksCommand(storage, state.get(userId), tasks, tasksSolution);
+                command = new GenerateTasksCommand(storage, state.get(userId), generator, tasks, tasksSolution);
                 break;
             case ANSWERS:
                 command = new AnswersCommand(storage, state.get(userId), answersFile, tasks, tasksSolution);
@@ -115,7 +116,7 @@ public class QueryHandler {
                 command = new StatCommand(storage);
                 break;
             case SOLVE:
-                command = new SolveUserTaskCommand(storage, state.get(userId));
+                command = new SolveUserTaskCommand(storage, generator, state.get(userId));
                 break;
             default:
                 return null;
