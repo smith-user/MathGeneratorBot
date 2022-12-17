@@ -1,4 +1,4 @@
-package MathGeneratorBot.PDF;
+package MathGeneratorBot.PDF; // TODO lowercase
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;

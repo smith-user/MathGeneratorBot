@@ -1,5 +1,6 @@
 package MathGeneratorBot.appContext;
 
+import MathGeneratorBot.logMessage.PropertiesMessage;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,28 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static MathGeneratorBot.logMessage.PropertiesMessage.MessageType.*;
+
 @Component
 @Scope("singleton")
 public class AppProperties {
-    private static final Logger logger = LogManager.getLogger(AppProperties.class.getName());
-    private final Map<PropertyNames, String> mapProperties;
-
-    public AppProperties(@Autowired Properties properties) {
-        mapProperties = new HashMap<>();
-        for(PropertyNames property : PropertyNames.values()) {
-            try {
-                mapProperties.put(property, properties.getProperty(property.name));
-            } catch (Exception e) {
-                logger.catching(e);
-                throw logger.throwing(Level.FATAL, new ContextException("Отсутствует свойство \"%s\"".formatted( property.name)));
-            }
-        }
-        logger.traceExit();
-    }
-
-    public String getProperty(PropertyNames property) {
-        return mapProperties.get(property);
-    }
 
     public enum PropertyNames {
         BOT_NAME("bot.name"),
@@ -43,4 +27,28 @@ public class AppProperties {
             this.name = name;
         }
     }
+
+    private static final Logger logger = LogManager.getLogger(AppProperties.class.getName());
+    private final Map<PropertyNames, String> mapProperties;
+
+    public AppProperties(@Autowired Properties properties) {
+        logger.traceEntry();
+        mapProperties = new HashMap<>();
+        for(PropertyNames property : PropertyNames.values()) {
+            String value = properties.getProperty(property.name);
+            if (value != null) {
+                mapProperties.put(property, value);
+            } else {
+                throw logger.throwing(new PropertiesMessage(PROPERTY_NOT_FOUND, Map.of("property", property.name)).getThrowable());
+            }
+        }
+        logger.info(new PropertiesMessage(READING_WAS_SUCCESSFUL, null).getFormattedMessage());
+        logger.traceExit();
+    }
+
+    public String getProperty(PropertyNames property) {
+        return mapProperties.get(property);
+    }
+
+
 }

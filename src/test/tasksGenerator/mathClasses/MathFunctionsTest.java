@@ -76,7 +76,4 @@ public class MathFunctionsTest {
         };
         assertArrayEquals(expected, actual);
     }
-
-
-
 }

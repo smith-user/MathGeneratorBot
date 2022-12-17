@@ -3,16 +3,19 @@
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <ThresholdFilter level="TRACE" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <PatternLayout pattern="%d{yyyy/MM/dd HH:mm:ss,SSS} %-5level %class{36}.%M(%F:%L) - %msg%n"/>
         </Console>
         <File name="AllLogs" fileName="target/all.log" append="false">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <PatternLayout pattern="%d{yyyy/MM/dd HH:mm:ss,SSS} %-5level %class{36}.%M(%F:%L) - %msg%n"/>
         </File>
         <File name="BotLogfile" fileName="target/bot.log" append="false">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <PatternLayout pattern="%d{yyyy/MM/dd HH:mm:ss,SSS} %-5level %class{1}.%M(%F:%L) - %msg%n"/>
+        </File>
+        <File name="InfoBot" fileName="target/bot.log" append="false">
+            <PatternLayout pattern="%d{yyyy/MM/dd HH:mm:ss,SSS} %-5level - %msg%xEx%n"/>
         </File>
         <File name="TestLogfile" fileName="target/tests.log" append="false">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <PatternLayout pattern="%d{yyyy/MM/dd HH:mm:ss,SSS} %-5level %class{36}.%M(%F:%L) - %msg%n"/>
         </File>
     </Appenders>
     <Loggers>
@@ -22,7 +25,8 @@
         <Logger name="MathGeneratorBot" level="trace">
             <Appender-ref ref="BotLogfile" />
         </Logger>
-        <Logger name="test" level="trace" additivity="false">
+
+        <Logger name="tests" level="trace" additivity="false">
             <Appender-ref ref="TestLogfile" />
         </Logger>
     </Loggers>

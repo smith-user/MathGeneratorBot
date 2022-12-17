@@ -2,6 +2,7 @@ package MathGeneratorBot.tasksGenerator.MathAPI.wolframAlphaAPI;
 
 import MathGeneratorBot.appContext.AppContext;
 import MathGeneratorBot.appContext.AppProperties;
+import MathGeneratorBot.logMessage.MathAPIMessage;
 import MathGeneratorBot.tasksGenerator.MathAPI.APIQueryException;
 import MathGeneratorBot.tasksGenerator.MathAPI.MathAPI;
 import MathGeneratorBot.tasksGenerator.TasksGenerator;
@@ -14,6 +15,7 @@ import com.wolfram.alpha.WAQuery;
 import com.wolfram.alpha.WAQueryResult;
 import com.wolfram.alpha.WASubpod;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,11 +23,15 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
-public class WolframAlphaAPI implements MathAPI {
-    private static WolframAlphaAPI alphaAPI;
-    private final WAEngine engine;
+import static MathGeneratorBot.logMessage.MathAPIMessage.MessageType.*;
+
+final public class WolframAlphaAPI implements MathAPI {
     private static final Logger logger = LogManager.getLogger(TasksGenerator.class.getName());
+    private static final WolframAlphaAPI alphaAPI = new WolframAlphaAPI();
+    private final WAEngine engine;
+
     private WolframAlphaAPI() {
         engine = new WAEngine();
         engine.setAppID(getAppId());
@@ -34,14 +40,12 @@ public class WolframAlphaAPI implements MathAPI {
     }
 
     private static String getAppId() {
-        ApplicationContext ctx = AppContext.getApplicationContext();;
+        ApplicationContext ctx = AppContext.getApplicationContext();
         AppProperties properties = ctx.getBean(AppProperties.class);
         return properties.getProperty(AppProperties.PropertyNames.WOLFRAM_API_ID);
     }
 
     public static WolframAlphaAPI instance() {
-        if (alphaAPI == null)
-            alphaAPI = new WolframAlphaAPI();
         return alphaAPI;
     }
 
@@ -50,24 +54,41 @@ public class WolframAlphaAPI implements MathAPI {
         logger.traceEntry("input={}", request);
         WAQuery query = engine.createQuery();
         query.setInput("solve " + request);
+        String queryInput = query.getInput();
         try {
+            //TODO CaptureStream
+//            PrintStream out = new PrintStream(new FileOutputStream("target/file.txt"));
+//            PrintStream err = new PrintStream(new FileOutputStream("target/file.txt"));
+//            System.setOut(out);
+//            System.setErr(err);
+            logger.info(new MathAPIMessage(PERFORM_QUERY, Map.of("query", queryInput)).getFormattedMessage());
             WAQueryResult queryResult = engine.performQuery(query);
             if (queryResult.isError()) {
-                throw logger.throwing(new APIQueryException(("""
-                        WolframAlphaAPI Query Exception
-                          error code: %d
-                          error message:  %s""").formatted(
-                                  queryResult.getErrorCode(),
-                                    queryResult.getErrorMessage())
-                ));
+                throw logger.throwing(
+                        Level.WARN,
+                        new MathAPIMessage(QUERY_EXCEPTION, Map.of(
+                                "query", queryInput,
+                                "error code", String.valueOf(queryResult.getErrorCode()),
+                                "error message", queryResult.getErrorMessage())
+                        ).getThrowable()
+                );
             } else if (!queryResult.isSuccess()) {
-                throw logger.throwing(new APIQueryException("Query was not understood; no results available."));
+                throw logger.throwing(
+                        Level.WARN,
+                        new MathAPIMessage(QUERY_EXCEPTION, Map.of(
+                                "query", queryInput,
+                                "message", "Query was not understood; no results available.")
+                        ).getThrowable()
+                );
             } else {
-                // Got a result.
+                logger.info(new MathAPIMessage(RESPONSE_RECEIVED, Map.of("query", query.getInput())).getFormattedMessage());
                 return logger.traceExit(getContent(queryResult));
             }
         } catch (WAException e) {
-            throw logger.throwing(new APIQueryException(e));
+            throw logger.throwing(
+                    Level.WARN,
+                    new MathAPIMessage(QUERY_EXCEPTION, Map.of("query", queryInput)).getThrowable(e)
+            );
         }
     }
 

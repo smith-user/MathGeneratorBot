@@ -188,7 +188,7 @@ public class HandlerTest {
 
         handler.getResponse(testCommand, USER_ID);
         handler.getResponse(testInput, USER_ID);
-        assertEquals(handler.getResponse(testCommand, USER_ID),
+        assertEquals(handler.getResponse("/answers", USER_ID),
                 DefaultResponse.GET_ANSWERS);
         assertEquals(handler.getResponse("-", USER_ID).split("\n")[0],
                 "Решены 0 из 1 задач");
