@@ -26,6 +26,7 @@ public class HandlerTest {
     QueryHandler handler;
     static JsonStorage storage;
     static TasksGenerator generator;
+    static MathTask task;
 
     /**
      * Создаются макеты классов {@code JsonStorage} и {@code TaskGenerator}.
@@ -33,15 +34,15 @@ public class HandlerTest {
      * команд обработчика, которые генерируют задачи или ответы к ним.
      */
     @BeforeAll
-    static void init() throws TaskCreationException{
+    static void init() {
         storage = Mockito.mock(JsonStorage.class);
         generator = Mockito.mock(TasksGenerator.class);
 
         TaskCondition taskCondition = new LinearEquationTaskCondition(new Fraction(5), new Fraction(1));
         TaskSolution taskSolution = new LinearEquationTaskSolution("solution steps", "result");
-        MathTask task = new MathTask(taskCondition, taskSolution);
-        Mockito.when(generator.createTaskByType(TasksGenerator.MathTaskTypes.LINEAR_EQUATION))
-                .thenReturn(task);
+        task = new MathTask(taskCondition, taskSolution);
+
+
     }
 
     /**
@@ -69,7 +70,10 @@ public class HandlerTest {
      * типа и количества задач обратно на {@code HandlerState.COMMAND_WAITING}
      */
     @Test
-    void testHandlerStatesInTasksCommand() {
+    void testHandlerStatesInTasksCommand() throws TaskCreationException {
+        Mockito.when(generator.createTaskByType(TasksGenerator.MathTaskTypes.LINEAR_EQUATION))
+                .thenReturn(task);
+
         assertEquals(handler.getState(USER_ID), HandlerState.COMMAND_WAITING);
         handler.getResponse("/tasks", USER_ID);
         assertEquals(handler.getState(USER_ID), HandlerState.TASK_TYPE_WAITING);
@@ -87,7 +91,9 @@ public class HandlerTest {
      * обратно на {@code HandlerState.COMMAND_WAITING}
      */
     @Test
-    void testHandlerStatesInAnswersCommand() {
+    void testHandlerStatesInAnswersCommand() throws TaskCreationException {
+        Mockito.when(generator.createTaskByType(TasksGenerator.MathTaskTypes.LINEAR_EQUATION))
+                .thenReturn(task);
 
         handler.getResponse("/tasks", USER_ID);
         handler.getResponse("уравнения 1", USER_ID);
@@ -106,8 +112,9 @@ public class HandlerTest {
      */
     @Test
     void testHelpCommand() {
+        String testCommand = "/help";
         HelpCommand helpCommand = new HelpCommand();
-        assertEquals(handler.getResponse("/help", USER_ID), helpCommand.execute(USER_ID, null));
+        assertEquals(handler.getResponse(testCommand, USER_ID), helpCommand.execute(USER_ID, null));
     }
 
     /**
@@ -117,10 +124,11 @@ public class HandlerTest {
      */
     @Test
     void testStatCommand(){
+        String testCommand = "/stat";
         User user = new User(-1);
         user.addGeneratedTasks(1);
         Mockito.when(storage.getUserById(USER_ID)).thenReturn(user);
-        assertEquals(handler.getResponse("/stat", USER_ID),
+        assertEquals(handler.getResponse(testCommand, USER_ID),
                 "Всего вы сгенерировали *%d* задач и решили из них *%d* задач".formatted(
                 user.getGeneratedTasks(), user.getSolvedTasks()));
     }
@@ -129,10 +137,15 @@ public class HandlerTest {
      * Проверка команды /tasks.
      */
     @Test
-    void testTasksCommand() {
-        assertEquals(handler.getResponse("/tasks", USER_ID),
+    void testTasksCommand() throws TaskCreationException {
+        String testCommand = "/tasks";
+        String testInput = "уравнения 1";
+        Mockito.when(generator.createTaskByType(TasksGenerator.MathTaskTypes.LINEAR_EQUATION))
+                .thenReturn(task);
+
+        assertEquals(handler.getResponse(testCommand, USER_ID),
                      DefaultResponse.GET_TASK_TYPE);
-        assertEquals(handler.getResponse("уравнения 1", USER_ID).split(":")[0],
+        assertEquals(handler.getResponse(testInput, USER_ID).split(":")[0],
                 "Найдите все корни или убедитесь, что их нет");
     }
 
@@ -140,11 +153,26 @@ public class HandlerTest {
      * Првоерка команды /tasks при неверном вводе типа задач.
      */
     @Test
-    void testWrongTasksCommand() {
-        assertEquals(handler.getResponse("/tasks", USER_ID),
+    void testWrongTasksType() {
+        String testCommand = "/tasks";
+        String testInput = "wrong input";
+        assertEquals(handler.getResponse(testCommand, USER_ID),
                 DefaultResponse.GET_TASK_TYPE);
-        assertEquals(handler.getResponse("wrong input", USER_ID),
+        assertEquals(handler.getResponse(testInput, USER_ID),
                 DefaultResponse.ILLEGAL_TYPE_OF_TASKS);
+    }
+
+    /**
+     * Проверка команды /tasks при ошибке генерации задач.
+     */
+    @Test
+    void testErrorTaskGeneration() throws TaskCreationException {
+        String testCommand = "/tasks";
+        String testInput = "арифметика 1";
+        Mockito.when(generator.createTaskByType(TasksGenerator.MathTaskTypes.RATIONAL_ARITHMETIC))
+                .thenThrow(TaskCreationException.class);
+        handler.getResponse(testCommand, USER_ID);
+        assertEquals(handler.getResponse(testInput, USER_ID), DefaultResponse.TASK_GENERATE_FAIL);
     }
 
     /**
@@ -152,12 +180,15 @@ public class HandlerTest {
      * C начада генерирются задачи командной /tasks.
      */
     @Test
-    void testAnswersCommand() {
+    void testAnswersCommand() throws TaskCreationException {
+        String testCommand = "/tasks";
+        String testInput = "уравнения 1";
+        Mockito.when(generator.createTaskByType(TasksGenerator.MathTaskTypes.LINEAR_EQUATION))
+                .thenReturn(task);
 
-
-        handler.getResponse("/tasks", USER_ID);
-        handler.getResponse("уравнения 1", USER_ID);
-        assertEquals(handler.getResponse("/answers", USER_ID),
+        handler.getResponse(testCommand, USER_ID);
+        handler.getResponse(testInput, USER_ID);
+        assertEquals(handler.getResponse(testCommand, USER_ID),
                 DefaultResponse.GET_ANSWERS);
         assertEquals(handler.getResponse("-", USER_ID).split("\n")[0],
                 "Решены 0 из 1 задач");
@@ -168,7 +199,8 @@ public class HandlerTest {
      */
     @Test
     void testWrongAnswersCommand() {
-        assertEquals(handler.getResponse("/answers", USER_ID),
+        String testCommand = "/answers";
+        assertEquals(handler.getResponse(testCommand, USER_ID),
                 DefaultResponse.NO_TASKS_GENERATED);
     }
 
@@ -179,13 +211,24 @@ public class HandlerTest {
      */
     @Test
     void testSolveUserInputTask() throws TaskCreationException {
-        TaskCondition taskCondition = new LinearEquationTaskCondition(new Fraction(5), new Fraction(1));
-        TaskSolution taskSolution = new LinearEquationTaskSolution("solution steps", "result");
-        MathTask task = new MathTask(taskCondition, taskSolution);
+        String testCommand = "/solve";
+        String testInput = "test string";
+        Mockito.when(generator.createTask(testInput)).thenReturn(task);
 
-        Mockito.when(generator.createTask("test string")).thenReturn(task);
+        handler.getResponse(testCommand, USER_ID);
+        assertEquals(handler.getResponse(testInput, USER_ID), "`%s`".formatted(task.getSolution()));
+    }
 
-        handler.getResponse("/solve", USER_ID);
-        assertEquals(handler.getResponse("test string", USER_ID), "`%s`".formatted(taskSolution.toString()));
+    /**
+     * Проверка команды /solve при вводе некоректной задачи.
+     */
+    @Test
+    void testSolveUserInputWrongTask() throws TaskCreationException {
+        String testCommand = "/solve";
+        String testInput = "wrong test string";
+        Mockito.when(generator.createTask(testInput)).thenThrow(TaskCreationException.class);
+
+        handler.getResponse(testCommand, USER_ID);
+        assertEquals(handler.getResponse(testInput, USER_ID), DefaultResponse.TASK_SOLVE_FAIL);
     }
 }
