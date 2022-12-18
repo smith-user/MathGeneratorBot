@@ -1,7 +1,7 @@
 package test.tasksGenerator.mathClasses;
 
-import MathGeneratorBot.tasksGenerator.mathClasses.Fraction;
-import MathGeneratorBot.tasksGenerator.mathClasses.MathFunctions;
+import mathGeneratorBot.tasksGenerator.mathClasses.Fraction;
+import mathGeneratorBot.tasksGenerator.mathClasses.MathFunctions;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
