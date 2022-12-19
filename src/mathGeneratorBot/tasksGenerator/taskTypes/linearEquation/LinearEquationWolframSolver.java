@@ -2,6 +2,7 @@ package mathGeneratorBot.tasksGenerator.taskTypes.linearEquation;
 
 import mathGeneratorBot.tasksGenerator.mathAPI.APIQueryException;
 import mathGeneratorBot.tasksGenerator.mathAPI.wolframAlphaAPI.WolframAlphaAPI;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import mathGeneratorBot.tasksGenerator.exceptions.TaskSolutionException;
@@ -22,7 +23,7 @@ public class LinearEquationWolframSolver extends LinearEquationSolver {
         try {
             result = wolframAPI.performQuery(condition.getExpression());
         } catch (APIQueryException e) {
-            throw logger.throwing(new TaskSolutionException(e));
+            throw logger.throwing(Level.WARN, new TaskSolutionException(e));
         }
 
         LinearEquationTaskSolution solution;
@@ -38,7 +39,7 @@ public class LinearEquationWolframSolver extends LinearEquationSolver {
         } else if(result.containsKey("Solution over the reals"))
             solution = new LinearEquationTaskSolution(LinearEquationTaskSolution.SpecialCases.INFINITE_NUMBER_OF_ROOTS);
         else
-            throw logger.throwing(new TaskSolutionException("Неизвестный формат ответа WolframAPI."));
+            throw logger.throwing(Level.WARN, new TaskSolutionException("Неизвестный формат ответа WolframAPI."));
         return logger.traceExit(solution);
     }
 }

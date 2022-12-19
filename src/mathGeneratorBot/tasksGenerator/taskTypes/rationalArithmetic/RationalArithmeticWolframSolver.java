@@ -2,6 +2,7 @@ package mathGeneratorBot.tasksGenerator.taskTypes.rationalArithmetic;
 
 import mathGeneratorBot.tasksGenerator.mathAPI.APIQueryException;
 import mathGeneratorBot.tasksGenerator.mathAPI.wolframAlphaAPI.WolframAlphaAPI;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import mathGeneratorBot.tasksGenerator.exceptions.TaskSolutionException;
@@ -24,8 +25,8 @@ public class RationalArithmeticWolframSolver extends RationalArithmeticSolver {
         try {
             result = wolframAPI.performQuery(condition.getExpression());
         } catch (APIQueryException e) {
-            logger.catching(e);
-            throw logger.throwing(new TaskSolutionException(e));
+            logger.catching(Level.TRACE, e);
+            throw logger.throwing(Level.WARN, new TaskSolutionException(e));
         }
 
         String keyOfResult = getKeyOfResult(result);
@@ -37,7 +38,7 @@ public class RationalArithmeticWolframSolver extends RationalArithmeticSolver {
             else
                 solution = new RationalArithmeticTaskSolution(result.get("Input").get(0), results.get(0));
         } else {
-            throw logger.throwing(new TaskSolutionException("Неизвестный формат ответа WolframAPI."));
+            throw logger.throwing(Level.WARN, new TaskSolutionException("Неизвестный формат ответа WolframAPI."));
         }
         return logger.traceExit(solution);
     }

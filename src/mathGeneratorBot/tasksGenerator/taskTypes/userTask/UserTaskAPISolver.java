@@ -4,6 +4,7 @@ import mathGeneratorBot.tasksGenerator.mathAPI.APIQueryException;
 import mathGeneratorBot.tasksGenerator.mathAPI.MathAPI;
 import mathGeneratorBot.tasksGenerator.mathAPI.wolframAlphaAPI.WolframAlphaAPI;
 import mathGeneratorBot.tasksGenerator.exceptions.TaskSolutionException;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,7 +23,7 @@ final public class UserTaskAPISolver extends UserTaskSolver {
             HashMap<String, ArrayList<String>> results = api.performQuery(condition.getExpression());
             return logger.traceExit(new UserTaskSolution(getStringResult(results)));
         } catch (APIQueryException exc) {
-            throw logger.throwing(new TaskSolutionException(exc.getMessage()));
+            throw logger.throwing(Level.WARN, new TaskSolutionException(exc.getMessage()));
         }
     }
 
