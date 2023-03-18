@@ -3,4 +3,8 @@
 /.idea/workspace.xml
 
 /.idea
-/target
+target
+src/mathGeneratorBot/resources/answers.pdf
+
+#Ignore private info
+src/mathGeneratorBot/resources/application.properties
